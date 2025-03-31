@@ -1,0 +1,24 @@
+{
+  "name": "sprout-space",
+  "version": "1.0.0",
+  "description": "A MERN stack Web App for planning a garden plot.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/M-Dearlove/Sprout-Space.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/M-Dearlove/Sprout-Space/issues"
+  },
+  "homepage": "https://github.com/M-Dearlove/Sprout-Space#readme",
+  "dependencies": {
+    "typescript": "^5.8.2",
+    "vite": "^6.2.3"
+  }
+}
