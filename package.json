@@ -5,7 +5,19 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm i && npm run build && npm run start:dev",
+    "start": "npm run client:build && npm run server",
+    "start:dev": "concurrently \"npm run server:dev\" \"wait-on tcp:3001 && npm run client:dev\"",
+    "server": "cd server && npm start",
+    "server:build": "cd server && npm run build",
+    "server:dev": "cd server && npm run dev",
+    "install": "cd server && npm i && cd ../client && npm i",
+    "client:build": "cd client && npm run build",
+    "client:dev": "cd client && npm run dev",
+    "build": "npm run server:build && npm run client:build",
+    "seed": "cd server && npm run seed",
+    "render-build": "npm install && npm run server:build && npm run client:build"
   },
   "repository": {
     "type": "git",
@@ -18,7 +30,15 @@
   },
   "homepage": "https://github.com/M-Dearlove/Sprout-Space#readme",
   "dependencies": {
+    "express": "^5.1.0",
+    "react-router": "^7.4.1",
+    "react-router-dom": "^7.4.1",
     "typescript": "^5.8.2",
     "vite": "^6.2.3"
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.3.3",
+    "concurrently": "^9.1.2",
+    "wait-on": "^8.0.3"
   }
 }
