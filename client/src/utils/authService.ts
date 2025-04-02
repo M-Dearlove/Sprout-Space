@@ -1,85 +1,60 @@
-//client/src/utils.auth.ts
-import { JwtPayload, jwtDecode } from 'jwt-decode';
+import { type JwtPayload, jwtDecode } from 'jwt-decode';
+
+// Extending the JwtPayload interface to include additional data fields specific to the application.
+interface ExtendedJwt extends JwtPayload {
+  data:{
+    email:string,
+    id:string
+  }
+};
 
 class AuthService {
+  // This method decodes the JWT token to get the user's profile information.
   getProfile() {
-    // return the decoded token
-    const token = this.getToken();
-    if (token) {
-      return jwtDecode<JwtPayload>(token); // Decode the token and return the payload
-    }
-    return null; // If no token, return null
+    // jwtDecode is used to decode the JWT token and return its payload.
+    return jwtDecode<ExtendedJwt>(this.getToken());
   }
 
-  decodeToken(token: string | null) {
-    if (!token) return null;
-    try {
-      const decoded =  jwtDecode<{ id: number }>(token); // Ensure userId is present
-      console.log('Decoded in AuthService', decoded);
-      return decoded;
-    } catch (error) {
-      console.error("Error decoding token:", error);
-      return null;
-    }
-  }
-
+  // This method checks if the user is logged in by verifying the presence and validity of the token.
   loggedIn() {
-    //return a value that indicates if the user is logged in
     const token = this.getToken();
-    if (token) {
-      if (this.isTokenExpired(token)) {
-        //log user out if token expires
-        this.logout();  //log the user out 
-        return false; //return false to indicate the user is no longer logged in
-      }
-      return true; //if token is not expired will return true
-    }
-    return false; //if no token
+    // Returns true if the token exists and is not expired.
+    return !!token && !this.isTokenExpired(token);
   }
-  
+
+  // This method checks if the provided token is expired.
   isTokenExpired(token: string) {
-    // TODO: return a value that indicates if the token is expired
     try {
-      const decoded: JwtPayload = jwtDecode(token);
-      //if decoded.exp undefined return expired
-      if (!decoded.exp) {
+      // jwtDecode decodes the token to check its expiration date.
+      const decoded = jwtDecode<JwtPayload>(token);
+
+      // Returns true if the token has expired, false otherwise.
+      if (decoded?.exp && decoded?.exp < Date.now() / 1000) {
         return true;
       }
-       const expirationTime = decoded.exp * 1000; // Convert expiration time to milliseconds
-      //Date now milisecons since JAn 1, 1970 (Unix timestamp)
-      const expired = Date.now() > expirationTime; // Return true if the token is expired
-        return expired;
-    } catch (error) {
-        return true; // If decoding fails, treat the token as expired
+    } catch (err) {
+      // If decoding fails, assume the token is not expired.
+      return false;
     }
   }
 
+  // This method retrieves the token from localStorage.
   getToken(): string {
-    // return the token
-    const storedToken =  localStorage.getItem('token') || '';
-    return storedToken;
-    }
-
-  login(idToken: string) {
-    //  set the token to localStorage
-    localStorage.setItem('token', idToken); // Store token in localStorage
-    
-    //  redirect to the home page
-    window.location.href = '/'; // Redirect to the home page 
+    const loggedUser = localStorage.getItem('id_token') || '';
+    // Returns the token stored in localStorage.
+    return loggedUser;
   }
 
-  logout() {
-    // to log someone out remove the token from localStorage
-    localStorage.removeItem('token'); // Remove token from localStorage
-    const emailInput = document.getElementById('email') as HTMLInputElement;
-    const passwordInput = document.getElementById('password') as HTMLInputElement;
+  // This method logs in the user by storing the token in localStorage and redirecting to the home page.
+  login(idToken: string) {
+    localStorage.setItem('id_token', idToken);
+    window.location.assign('/');
+  }
 
-    if (emailInput && passwordInput) {
-      emailInput.value = '';  // Clear email field
-      passwordInput.value = '';  // Clear password field
-    }
-    //redirect to the login page
-    window.location.href = '/'; // Redirect to main page
+  // This method logs out the user by removing the token from localStorage and redirecting to the home page.
+  logout() {
+    localStorage.removeItem('id_token');
+    window.location.assign('/');
   }
 }
 

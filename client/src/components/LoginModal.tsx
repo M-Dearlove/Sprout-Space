@@ -1,57 +1,57 @@
-//LoginModal.tsx
-import { login } from "../api/authAPI";
-import React,  { useState } from "react";
+import React, { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { LOGIN_USER, REGISTER_USER } from "../utils/queries";
+import AuthService from "../utils/authService";
 
 interface LoginModalProps {
   isLoginMode: boolean;
-  onLoginSuccess: ()=> void; //callback for a successful login
-  onForgotPassword: ()=> void; //callback for forgot password
+  onLoginSuccess: () => void;
+  onForgotPassword: () => void;
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isLoginMode, onLoginSuccess, onForgotPassword }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
-  
-  const handleLoginOrRegister = async (e: React.FormEvent<HTMLFormElement>) => {
+  // GraphQL mutations for login and register
+  const [login] = useMutation(LOGIN_USER);
+  const [register] = useMutation(REGISTER_USER);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      let response;
       if (isLoginMode) {
-        // Use login function from authAPI.tsx
-        const data = await login({email, password});
-         if (data && data.token) {
-          localStorage.setItem("token", data.token);
-          console.log('HANDLE LOGIN SUCCESS')
-          onLoginSuccess(); //Navigate to the dahsboard page
-          setEmail(""); //clear the input fields
-          setPassword("");
-        } else {
-          alert("Login failed");
-        }
-      } else {
-        // Handle user registration
-        const response = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+        response = await login({ 
+          variables: { email, password } 
         });
-
-        if (!response.ok) {
-          throw new Error("Registration failed");
-        }
-
-        alert("Registration successful! Logging you in...");
-        setEmail(""); //clear the input fields
-        setPassword("");
+      } else {
+        console.log('Register credentials:')
+        console.log(email, password)
+        response = await register({ 
+          variables: { email, password } 
+         });
       }
+
+      if (response.data) {
+        const token = isLoginMode ? response.data.login.token : response.data.register.token;
+        AuthService.login(token);
+        onLoginSuccess();
+      } else {
+        alert("Authentication failed. Please try again.");
+      }
+
+      setEmail("");
+      setPassword("");
     } catch (err) {
+
       console.error("Error:", err);
       alert("An error occurred. Please try again.");
     }
   };
 
   return (
-    <form onSubmit={handleLoginOrRegister}>
+    <form onSubmit={handleSubmit}>
       <div className="mb-3">
         <label>Email</label>
         <input
@@ -73,7 +73,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isLoginMode, onLoginSuccess, on
         />
       </div>
       <button type="submit" className="btn btn-gray">
-        {isLoginMode ? "Sign In" : "Submit" }
+        {isLoginMode ? "Sign In" : "Sign Up"}
       </button>
       {isLoginMode && (
         <p>
@@ -82,12 +82,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ isLoginMode, onLoginSuccess, on
           </a>
         </p>
       )}
-
-
-
     </form>
   );
 };
 
-
 export default LoginModal;
+
