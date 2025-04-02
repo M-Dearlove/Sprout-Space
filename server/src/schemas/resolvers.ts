@@ -12,6 +12,11 @@ interface LoginUserArgs {
   password: string;
 }
 
+interface ResetPasswordArgs {
+  email: string;
+  newPassword: string;
+}
+
 // Define GraphQL Context interface
 interface GraphQLContext {
   user?: {
@@ -59,7 +64,22 @@ const resolvers = {
       const token = signToken(user.email, user._id);
       return { token, user };
     },
+
+    resetPassword: async (_parent: any, { email, newPassword }: ResetPasswordArgs) => {
+      const user = await User.findOne({ email });
+
+      if (!user) {
+        throw new Error("User not found.");
+      }
+
+      user.password = newPassword;
+      await user.save();
+
+      return true;
+    },
+   
   },
 };
+
 
 export default resolvers;

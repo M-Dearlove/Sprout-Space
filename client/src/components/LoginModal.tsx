@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
-import { LOGIN_USER, REGISTER_USER } from "../utils/queries";
+import { LOGIN_USER, REGISTER_USER } from "../graphQL/mutations";
 import AuthService from "../utils/authService";
 
 interface LoginModalProps {
@@ -9,10 +9,20 @@ interface LoginModalProps {
   onForgotPassword: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isLoginMode, onLoginSuccess, onForgotPassword }) => {
+const LoginModal: React.FC<LoginModalProps> = ({
+  isLoginMode,
+  onLoginSuccess,
+  onForgotPassword,
+}) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+
+// Clear input fields when toggling login/register mode
+useEffect(() => {
+      setEmail("");
+      setPassword("");
+}, [isLoginMode]);
+
   // GraphQL mutations for login and register
   const [login] = useMutation(LOGIN_USER);
   const [register] = useMutation(REGISTER_USER);
@@ -22,29 +32,29 @@ const LoginModal: React.FC<LoginModalProps> = ({ isLoginMode, onLoginSuccess, on
     try {
       let response;
       if (isLoginMode) {
-        response = await login({ 
-          variables: { email, password } 
+        response = await login({
+          variables: { email, password },
         });
       } else {
-        console.log('Register credentials:')
-        console.log(email, password)
-        response = await register({ 
-          variables: { email, password } 
-         });
+        console.log("Register credentials:");
+        console.log(email, password);
+        response = await register({
+          variables: { email, password },
+        });
       }
 
       if (response.data) {
-        const token = isLoginMode ? response.data.login.token : response.data.register.token;
+        const token = isLoginMode
+          ? response.data.login.token
+          : response.data.register.token;
         AuthService.login(token);
+        setEmail(""); // Reset fields before navigating
+        setPassword("");
         onLoginSuccess();
       } else {
         alert("Authentication failed. Please try again.");
       }
-
-      setEmail("");
-      setPassword("");
     } catch (err) {
-
       console.error("Error:", err);
       alert("An error occurred. Please try again.");
     }
@@ -87,4 +97,3 @@ const LoginModal: React.FC<LoginModalProps> = ({ isLoginMode, onLoginSuccess, on
 };
 
 export default LoginModal;
-

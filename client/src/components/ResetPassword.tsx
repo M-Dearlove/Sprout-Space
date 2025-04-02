@@ -1,38 +1,51 @@
 //ResetPassword.tsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { RESET_PASSWORD } from "../graphQL/mutations";
+
 
 interface ResetPasswordProps {
   onCancel: () => void;
+  onSuccess: () => void;
 }
 
-const ResetPassword: React.FC<ResetPasswordProps> = ({ onCancel }) => {
+const ResetPassword: React.FC<ResetPasswordProps> = ({ onCancel, onSuccess }) => {
   const [email, setEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const navigate = useNavigate();
+ 
+
+  const [resetPassword, { loading, error }] = useMutation(RESET_PASSWORD);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch("/api/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, newPassword }),
+      const { data } = await resetPassword({
+        variables: { email, newPassword },
       });
 
-      if (!response.ok) throw new Error("Failed to reset password");
-
-      alert("Password reset successful! Please log in.");
-      navigate("/login"); //return to login
+      if (data?.resetPassword) {
+        alert("Password reset successful! Please log in.");
+        setEmail("")
+        onSuccess(); //switch to login form
+      } else {
+        alert("Failed to reset password.");
+      }
     } catch (err) {
       console.error("Error:", err);
       alert("An error occurred. Please try again.");
     }
   };
 
+  const handleCancel = () => {
+    setEmail(""); // Clear input fields
+    setNewPassword("");
+    onCancel();
+  };
+
   return (
     <form onSubmit={handleReset} className="reset-password-form">
-      <h2>Reset Password</h2>
+      {/* <h2>Reset Password</h2> */}
+      {error && <p className="error-message">Error: {error.message}</p>}
       <div className="form-group">
         <label>Email</label>
         <input
@@ -52,10 +65,10 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onCancel }) => {
         />
       </div>
       <div className="button-group">
-        <button type="submit" className="btn btn-gray">
-          Reset Password
+        <button type="submit" className="btn btn-gray" disabled={loading}>
+          {loading ? "Resetting..." : "Reset Password"}
         </button>
-        <button type="button" className="btn btn-secondary" onClick={onCancel}>
+        <button type="button" className="btn btn-secondary" onClick={handleCancel}>
           Cancel
         </button>
       </div>

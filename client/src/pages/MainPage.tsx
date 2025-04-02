@@ -52,9 +52,14 @@ function MainPage() {
               <h2>
                 {isResetPasswordMode ? "Reset Password" : isLoginMode ? "Welcome Back!" : "Create an Account"}
               </h2>
-
               {isResetPasswordMode ? (
-                <ResetPassword onCancel={() => setIsResetPasswordMode(false)} />
+                  <ResetPassword 
+                      onCancel={() => setIsResetPasswordMode(false)} 
+                      onSuccess={() => { 
+                      setIsResetPasswordMode(false);
+                      setIsLoginMode(true); 
+                       }} 
+                    />
               ) : (
                 <LoginModal
                   isLoginMode={isLoginMode}

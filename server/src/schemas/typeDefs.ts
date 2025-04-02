@@ -18,6 +18,7 @@ const typeDefs = `
   type Mutation {
     register(email: String!, password: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
+    resetPassword(email: String!, newPassword: String!): Boolean
   }
 `;
 
