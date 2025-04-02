@@ -1,6 +1,6 @@
 import logo from "../assets/images/Logo.png";
 import { useState, useEffect } from "react";
-//import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import LoginModal from "../components/LoginModal";
 import ResetPassword from "../components/ResetPassword";
 import AuthService from "../utils/authService"; // Import AuthService to check token
@@ -11,7 +11,7 @@ function MainPage () {
   // State for reset password form visibility
   const [isResetPasswordMode, setIsResetPasswordMode] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(AuthService.loggedIn()); // Track login status
- // const navigate = useNavigate() as (path:string) => void;  //to navigate to the dashboard upon login
+  const navigate = useNavigate() as (path:string) => void;  //to navigate to the dashboard upon login
 
   useEffect(() => {
     if (AuthService.loggedIn()) {
@@ -20,21 +20,21 @@ function MainPage () {
   }, []);
 
 
-  //useEffect(() => {
+  useEffect(() => {
 
-  //   // If the user is already logged in, redirect to the dashboard
-  //   if (AuthService.loggedIn()) {
-  //     console.log('Already logged in')
-  //     navigate("/dash");
+    // If the user is already logged in, redirect to the dashboard
+    if (AuthService.loggedIn()) {
+      console.log('Already logged in')
+      navigate("/dash");
 
-  //   }
-  // }, [navigate]);
+    }
+  }, [navigate]);
 
   const handleLoginSuccess = () => {
     // After a successful login, navigate to the dashboard
     console.log('Change to the Dash Page')
     setIsLoggedIn(true); // Show logout button instead of navigating away
-    //navigate("/dash");
+    navigate("/dash");
   };
 
   const handleLogout = () => {
