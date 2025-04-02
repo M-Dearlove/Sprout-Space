@@ -1,4 +1,4 @@
-import logo from "../assets/images/Logo.png";
+import logo from "../assets/images/logo.png";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginModal from "../components/LoginModal";
