@@ -22,21 +22,24 @@ function MainPage() {
 
 
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/");
-    }
-  }, [isLoggedIn, navigate]);
 
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigate("/");
+  //   }
+  // }, [isLoggedIn, navigate]);
+  
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    navigate("/");
+    // navigate("/garden-planner");
+
   };
 
   const handleLogout = () => {
     AuthService.logout();
     setIsLoggedIn(false);
+    navigate("/"); // Navigate to home page after logout
   };
 
   return (
@@ -44,6 +47,7 @@ function MainPage() {
       <div className="top-image">
         <img src={heading} alt="Woman Gardening" className="heading" />
       </div>
+
       <div className="content-container">
         <div className="left-side">
           <div className="text-container">
@@ -70,6 +74,7 @@ function MainPage() {
                   <ResetPassword
                     onCancel={() => setIsResetPasswordMode(false)}
                     onSuccess={() => {
+
                       setIsResetPasswordMode(false);
                       setIsLoginMode(true);
                     }}
