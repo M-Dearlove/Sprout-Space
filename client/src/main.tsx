@@ -4,8 +4,8 @@ import './index.css'
 import App from './App'
 import MainPage from './pages/MainPage.tsx'
 import ErrorPage from './pages/ErrorPage.tsx';
-import DashboardPage from './pages/DashboardPage.tsx'
-
+import GardenPlanner from './pages/GardenPlanner.tsx'
+import Profile from './pages/Profile.tsx'
 
 console.log('Running MAIN.tsx')
 const router = createBrowserRouter([
@@ -19,9 +19,17 @@ const router = createBrowserRouter([
       element: <MainPage />
     }, 
     {
-      path: '/dash',
-      element: <DashboardPage />
+      path: '/garden-planner',
+      element: <GardenPlanner />
     },
+    {
+      path: '/profile',
+      element: <Profile />
+    },
+    // {
+    //   path: '/pest-control',
+    //   element: <PestControl /> //??? 
+    // },
   ]
   }
 ]);
