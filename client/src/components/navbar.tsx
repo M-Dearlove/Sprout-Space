@@ -1,5 +1,6 @@
 import { Disclosure, DisclosurePanel, DisclosureButton } from '@headlessui/react';
 import { useState, useEffect } from 'react';
+import '../styles/NavBar.css';
 
 const allNavigation = [
     { name: 'Home', href: '#', current: true },
@@ -8,12 +9,11 @@ const allNavigation = [
     { name: 'Profile', href: '#', current: false },
 ];
 
-function classNames(...classes: any[]) {
+function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ');
 }
 
 export default function NavBar() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [navigation, setNavigation] = useState([allNavigation[0]]); // Start with only Home
     
     useEffect(() => {
@@ -21,30 +21,28 @@ export default function NavBar() {
         const token = localStorage.getItem('token');
         
         if (token) {
-            setIsAuthenticated(true);
             setNavigation(allNavigation); // Show all navigation items
         } else {
-            setIsAuthenticated(false);
             setNavigation([allNavigation[0]]); // Show only Home
         }
     }, []);
     
     return (
-        <Disclosure as="nav" className="bg-gray-800">
-            {({ open }: { open: boolean }) => (
+        <Disclosure as="nav" className="navbar">
+            {({ open }) => (
                 <>
-                    <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-                        <div className="relative flex h-16 items-center justify-between">
+                    <div className="container">
+                        <div className="navbar-content">
                             {/* Mobile Menu */}
-                            <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                                <DisclosureButton className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus-ring-inset focus-ring-white">
+                            <div className="mobile-menu-button">
+                                <DisclosureButton className="menu-button">
                                     <span className="sr-only">Open main menu</span>
                                     {open ? (
-                                        <svg className="block h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                         </svg>
                                     ) : (
-                                        <svg className="block h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                                         </svg>
                                     )}
@@ -52,21 +50,20 @@ export default function NavBar() {
                             </div>
 
                             {/* Logo and brand */}
-                            <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-                                <div className="flex flex-shrink-0 items-center">
-                                    <span className="text-white font-bold text-xl">Sprout Space</span>
+                            <div className="brand-container">
+                                <div className="brand">
+                                    <span className="brand-name">Sprout Space</span>
                                 </div>
 
                                 {/* Desktop navigation */}
-                                <div className="hidden sm:ml-6 sm:block">
-                                    <div className="flex space-x-4">
+                                <div className="desktop-nav">
+                                    <div className="nav-links">
                                         {navigation.map((item) => (
                                             <a
                                                 key={item.name}
                                                 href={item.href}
                                                 className={classNames(
-                                                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                                    'rounded-md px-3 py-2 text-sm font-medium'
+                                                    item.current ? 'nav-link-active' : 'nav-link',
                                                 )}
                                                 aria-current={item.current ? 'page' : undefined}
                                             >
@@ -80,16 +77,15 @@ export default function NavBar() {
                     </div>
 
                     {/* Mobile menu */}
-                    <DisclosurePanel className="sm:hidden">
-                        <div className="space-y-1 px-2 pt-2">
+                    <DisclosurePanel className="mobile-nav">
+                        <div className="mobile-nav-content">
                             {navigation.map((item) => (
                                 <DisclosureButton
                                     key={item.name}
                                     as="a"
                                     href={item.href}
                                     className={classNames(
-                                        item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                                        'block rounded-md px-3 py-2 text-base font-medium'
+                                        item.current ? 'mobile-nav-link-active' : 'mobile-nav-link',
                                     )}
                                     aria-current={item.current ? 'page' : undefined}
                                 >
@@ -97,11 +93,8 @@ export default function NavBar() {
                                 </DisclosureButton>
                             ))}
                             
-                            <div className="mt-4 px-3">
-                                <button
-                                    type="button"
-                                    className="w-full rounded-md bg-blue-600 px-3.5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-                                >
+                            <div className="signup-button-container">
+                                <button type="button" className="signup-button">
                                     Sign Up
                                 </button>
                             </div>
