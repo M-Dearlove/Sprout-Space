@@ -49,13 +49,13 @@ function MainPage() {
             <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>
-            {/* Optional: Temporary navigation button for testing */}
-            <button 
+            {/* Temporary navigation button for testing */}
+            {/* <button 
               className="test-nav-btn" 
               onClick={() => navigate("/garden-planner")}
             >
               Go to Garden Planner (Test)
-            </button>
+            </button> */}
           </>
           ) : (
             <>
