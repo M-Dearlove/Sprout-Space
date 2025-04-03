@@ -22,21 +22,22 @@ function MainPage() {
 
 
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/");
-    }
-  }, [isLoggedIn, navigate]);
-
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigate("/");
+  //   }
+  // }, [isLoggedIn, navigate]);
+  
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    navigate("/");
+    // navigate("/garden-planner");
   };
 
   const handleLogout = () => {
     AuthService.logout();
     setIsLoggedIn(false);
+    navigate("/"); // Navigate to home page after logout
   };
 
   return (
