@@ -1,0 +1,41 @@
+.emailEntry {
+    color: var(--brand-text);
+}
+
+.passwordEntry {
+    color: var(--brand-text);
+}
+
+.form-control-1 {
+    width: 225px;
+    background-color: #f0eded;
+    color: black;
+    border-color: var(--brand-secondary);
+    border-radius: 6px;
+}
+
+.form-control-2 {
+    width: 193px;
+    background-color: #f0eded;
+    color: black;
+    border-color: var(--brand-secondary);
+    border-radius: 6px;
+    margin-top: 5px;
+}
+
+.submit {
+    background-color: var(--brand-secondary);
+    color: var(--brand-text);
+    font-weight: 700;
+    font-size: 1.25rem;
+    border-radius: 6px;
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.login-form a {
+    color: var(--brand-accent-dark);
+}

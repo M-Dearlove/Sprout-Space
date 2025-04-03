@@ -1,5 +1,3 @@
-@import "tailwindcss";
-
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -7,7 +5,11 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --brand-primary: #b5cbb7;
+  --brand-secondary: #d2e4c4;
+  --brand-accent: #bfb1c1;
+  --brand-accent-dark: #968498;
+  --brand-text: #000000;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
