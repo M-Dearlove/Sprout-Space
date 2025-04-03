@@ -15,6 +15,9 @@ function classNames(...classes: any[]) {
 export default function NavBar() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [navigation, setNavigation] = useState([allNavigation[0]]); // Start with only Home
+
+    //added due to build error
+    console.log(isAuthenticated)
     
     useEffect(() => {
         // Check for token in localStorage
