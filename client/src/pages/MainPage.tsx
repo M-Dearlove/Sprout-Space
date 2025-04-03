@@ -19,21 +19,22 @@ function MainPage() {
 
 
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/dash");
-    }
-  }, [isLoggedIn, navigate]);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigate("/");
+  //   }
+  // }, [isLoggedIn, navigate]);
   
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    navigate("/dash");
+    // navigate("/garden-planner");
   };
 
   const handleLogout = () => {
     AuthService.logout();
     setIsLoggedIn(false);
+    navigate("/"); // Navigate to home page after logout
   };
 
   return (
@@ -44,9 +45,18 @@ function MainPage() {
       <div className="right-side">
         <div className="login-container">
           {isLoggedIn ? (
+            <>
             <button className="logout-btn" onClick={handleLogout}>
               Logout
             </button>
+            {/* Temporary navigation button for testing */}
+            {/* <button 
+              className="test-nav-btn" 
+              onClick={() => navigate("/garden-planner")}
+            >
+              Go to Garden Planner (Test)
+            </button> */}
+          </>
           ) : (
             <>
               <h2>

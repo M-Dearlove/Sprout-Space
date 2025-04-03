@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './GardenPlanner.css';
+import '../styles/Gardenplanner.css';
 import axios from 'axios';
 
 // Define interfaces
