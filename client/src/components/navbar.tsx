@@ -1,12 +1,13 @@
 import { Disclosure, DisclosurePanel, DisclosureButton } from '@headlessui/react';
 import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import '../styles/NavBar.css';
 
 const allNavigation = [
-    { name: 'Home', href: '#', current: true },
-    { name: 'Design A Garden', href: '#', current: false },
-    { name: 'Pest Search', href: '#', current: false },
-    { name: 'Profile', href: '#', current: false },
+    { name: 'Home', href: '/', current: true },
+    { name: 'Garden Planner', href: '/garden-planner', current: false },
+    { name: 'Pest Control', href: '/pest-control', current: false },
+    { name: 'Profile', href: '/profile', current: false },
 ];
 
 function classNames(...classes: string[]) {
@@ -14,22 +15,38 @@ function classNames(...classes: string[]) {
 }
 
 export default function NavBar() {
-    const [navigation, setNavigation] = useState([allNavigation[0]]); // Start with only Home
+    const location = useLocation();
+    const [navigation, setNavigation] = useState(
+        allNavigation.map(item => ({
+            ...item,
+            current: item.href === '/' // Initialize with Home as current
+        }))
+    );
 
-    //added due to build error
-    console.log(isAuthenticated)
-    
     useEffect(() => {
         // Check for token in localStorage
-        const token = localStorage.getItem('token');
-        
+        const token = localStorage.getItem('id_token');
+
+        // Update navigation items based on authentication
         if (token) {
-            setNavigation(allNavigation); // Show all navigation items
+            // Show all navigation items
+            setNavigation(
+                allNavigation.map(item => ({
+                    ...item,
+                    current: item.href === location.pathname // Set current based on path
+                }))
+            );
         } else {
-            setNavigation([allNavigation[0]]); // Show only Home
+            // Show only Home
+            setNavigation([
+                {
+                    ...allNavigation[0],
+                    current: location.pathname === '/'
+                }
+            ]);
         }
-    }, []);
-    
+    }, [location.pathname]);
+
     return (
         <Disclosure as="nav" className="navbar">
             {({ open }) => (
@@ -62,16 +79,16 @@ export default function NavBar() {
                                 <div className="desktop-nav">
                                     <div className="nav-links">
                                         {navigation.map((item) => (
-                                            <a
+                                            <Link
                                                 key={item.name}
-                                                href={item.href}
+                                                to={item.href}
                                                 className={classNames(
-                                                    item.current ? 'nav-link-active' : 'nav-link',
+                                                    location.pathname === item.href ? 'nav-link-active' : 'nav-link',
                                                 )}
-                                                aria-current={item.current ? 'page' : undefined}
+                                                aria-current={location.pathname === item.href ? 'page' : undefined}
                                             >
                                                 {item.name}
-                                            </a>
+                                            </Link>
                                         ))}
                                     </div>
                                 </div>
@@ -83,19 +100,21 @@ export default function NavBar() {
                     <DisclosurePanel className="mobile-nav">
                         <div className="mobile-nav-content">
                             {navigation.map((item) => (
-                                <DisclosureButton
-                                    key={item.name}
-                                    as="a"
-                                    href={item.href}
-                                    className={classNames(
-                                        item.current ? 'mobile-nav-link-active' : 'mobile-nav-link',
-                                    )}
-                                    aria-current={item.current ? 'page' : undefined}
-                                >
-                                    {item.name}
-                                </DisclosureButton>
+                                <div key={item.name}>
+                                    <DisclosureButton as="div">
+                                        <Link
+                                            to={item.href}
+                                            className={classNames(
+                                                location.pathname === item.href ? 'mobile-nav-link-active' : 'mobile-nav-link',
+                                            )}
+                                            aria-current={location.pathname === item.href ? 'page' : undefined}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    </DisclosureButton>
+                                </div>
                             ))}
-                            
+
                             <div className="signup-button-container">
                                 <button type="button" className="signup-button">
                                     Sign Up

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { LOGIN_USER, REGISTER_USER } from "../graphQL/mutations";
 import AuthService from "../utils/authService";
+import "../styles/LoginModal.css";
 
 interface LoginModalProps {
   isLoginMode: boolean;
@@ -61,28 +62,28 @@ useEffect(() => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div className="mb-3">
-        <label>Email</label>
+    <form onSubmit={handleSubmit} className="login-form">
+      <div className="emailEntry">
+        <label>Email:</label>
         <input
           type="email"
-          className="form-control"
+          className="form-control-1"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
       </div>
-      <div className="mb-3">
-        <label>Password</label>
+      <div className="passwordEntry">
+        <label>Password:</label>
         <input
           type="password"
-          className="form-control"
+          className="form-control-2"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
         />
       </div>
-      <button type="submit" className="btn btn-gray">
+      <button type="submit" className="submit">
         {isLoginMode ? "Sign In" : "Sign Up"}
       </button>
       {isLoginMode && (
