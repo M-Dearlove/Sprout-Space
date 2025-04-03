@@ -4,7 +4,7 @@
   "description": "A MERN stack Web App for planning a garden plot.",
   "main": "index.js",
   "type": "module",
- "scripts": {
+  "scripts": {
     "build": "npx tsc",
     "start": "node dist/server.js --ignore client",
     "dev": "npx nodemon",
@@ -38,6 +38,7 @@
     "sequelize": "^6.37.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.8",
     "typescript": "^5.4.5"
