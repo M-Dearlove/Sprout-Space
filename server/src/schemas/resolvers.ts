@@ -3,6 +3,8 @@ import { signToken, AuthenticationError } from '../utils/auth.js';
 
 // Define types for the arguments
 interface RegisterUserArgs {
+    firstname: string;
+    lastname: string;
     email: string;
     password: string;
 }
@@ -38,14 +40,14 @@ const resolvers = {
 
   Mutation: {
     // Register a new user
-    register: async (_parent: any, { email, password }: RegisterUserArgs) => {
+    register: async (_parent: any, { firstname, lastname, email, password }: RegisterUserArgs) => {
       const existingUser = await User.findOne({ email });
       console.log('Existing User:', existingUser)
       if (existingUser) {
         throw new Error('User already exists.');
       }
 
-      const user = await User.create({ email, password });
+      const user = await User.create({ firstname, lastname, email, password });
       console.log('User created', user)
       const token = signToken( user.email, user._id);
       console.log('token', token)

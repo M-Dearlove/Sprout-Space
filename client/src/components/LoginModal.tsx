@@ -17,11 +17,15 @@ const LoginModal: React.FC<LoginModalProps> = ({
 }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [firstname, setFirstname] = useState(""); 
+  const [lastname, setLastname] = useState(""); 
 
 // Clear input fields when toggling login/register mode
 useEffect(() => {
       setEmail("");
       setPassword("");
+      setFirstname("");
+      setLastname("");
 }, [isLoginMode]);
 
   // GraphQL mutations for login and register
@@ -40,7 +44,7 @@ useEffect(() => {
         console.log("Register credentials:");
         console.log(email, password);
         response = await register({
-          variables: { email, password },
+          variables: { firstname, lastname, email, password },
         });
       }
 
@@ -49,8 +53,10 @@ useEffect(() => {
           ? response.data.login.token
           : response.data.register.token;
         AuthService.login(token);
-        setEmail(""); // Reset fields before navigating
+        setEmail(""); // Reset fields 
         setPassword("");
+        setFirstname(""); 
+        setLastname(""); 
         onLoginSuccess();
       } else {
         alert("Authentication failed. Please try again.");
@@ -62,7 +68,9 @@ useEffect(() => {
   };
 
   return (
+
     <form onSubmit={handleSubmit} className="login-form">
+      
       <div className="emailEntry">
         <label>Email:</label>
         <input
@@ -83,6 +91,31 @@ useEffect(() => {
           required
         />
       </div>
+      {/* Add First and Last Name inputs for Registration */}
+      {!isLoginMode && (
+        <>
+          <div className="nameEntry">
+            <label>First Name:</label>
+            <input
+              type="text"
+              className="form-control-1"
+              value={firstname}
+              onChange={(e) => setFirstname(e.target.value)}
+              required
+            />
+          </div>
+          <div className="nameEntry">
+            <label>Last Name:</label>
+            <input
+              type="text"
+              className="form-control-1"
+              value={lastname}
+              onChange={(e) => setLastname(e.target.value)}
+              required
+            />
+          </div>
+        </>
+      )}
       <button type="submit" className="submit">
         {isLoginMode ? "Sign In" : "Sign Up"}
       </button>

@@ -38,7 +38,7 @@ import mint from '../assets/images/mint.png';
 import rosemary from '../assets/images/rosemary.png';
 import thyme from '../assets/images/thyme.png';
 import tomatoCherry from '../assets/images/cherry-tomato.png';
-import corn from '../assets/images/corn .png';
+import corn from '../assets/images/corn.png';
 
 export interface Plant {
     id: string;
