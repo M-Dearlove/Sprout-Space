@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/GardenPlanner.css';
+import '../styles/Gardenplanner.css';
 import axios from 'axios';
 import defaultPlantTypes, { Plant } from '../utils/plantData';
 
