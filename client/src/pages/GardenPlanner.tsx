@@ -133,7 +133,7 @@ const GardenPlanner: React.FC = () => {
             
             // Default spacing (can be adjusted)
             const spacing = 12;
-            
+           
             const mappedPlant = {
               id: `api-${plant.id}`,
               name: plant.common_name,
@@ -278,7 +278,6 @@ const GardenPlanner: React.FC = () => {
     <div className="garden-planner">
       <h1>Square Foot Garden Planner</h1>
       <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
-      
       <div className="garden-layout">
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
@@ -363,7 +362,6 @@ const GardenPlanner: React.FC = () => {
             >
               Clear Garden
             </button>
-            
             <button
               className="print-button"
               onClick={handlePrintGarden}
@@ -397,7 +395,6 @@ const GardenPlanner: React.FC = () => {
             <h3>Square Foot Garden Plan</h3>
             <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet</p>
           </div>
-          
           <div className="garden-grid-container">
             <div 
               className="garden-grid" 
@@ -571,7 +568,6 @@ const GardenPlanner: React.FC = () => {
           </div>
         </div>
       </div>
-      
       <style>
         {`
         @media print {

@@ -30,6 +30,7 @@
   },
   "homepage": "https://github.com/M-Dearlove/Sprout-Space#readme",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "express": "^5.1.0",
     "react-router": "^7.4.1",
     "react-router-dom": "^7.4.1",
@@ -37,8 +38,12 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.1",
     "wait-on": "^8.0.3"
   }
 }
