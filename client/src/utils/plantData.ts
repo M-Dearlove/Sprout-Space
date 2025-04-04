@@ -1,5 +1,5 @@
-import pumpkin from '../assets/pumpkin.png';
-import carrot from '../assets/carrot.png';
+import pumpkin from '../assets/images/pumpkin.png';
+import carrot from '../assets/images/carrot.png';
 import cucumber from '../assets/images/cucumber.png';
 import tomato from '../assets/images/tomato.png';
 import zucchini from '../assets/images/zucchini.png';
@@ -12,8 +12,8 @@ import cauliflower from '../assets/images/cauliflower.png';
 import onion from '../assets/images/onion.png';
 import garlic from '../assets/images/garlic.png';
 import potato from '../assets/images/potatoes.png';
-import sweetPotato from '../assets/images/sweetPotato.png';
-import corn from '../assets/images/corn.png';
+import sweetPotato from '../assets/images/sweet-potato.png';
+import peas from '../assets/images/peas.png';
 import asparagus from '../assets/images/asparagus.png';
 import beet from '../assets/images/beet.png';
 import bellPepper from '../assets/images/bell-pepper.png';
@@ -28,7 +28,6 @@ import raspberry from '../assets/images/raspberry.png';
 import watermelon from '../assets/images/watermelon.png';
 import cantaloupe from '../assets/images/cantaloupe.png';
 import radish from '../assets/images/radish.png';
-import peas from '../assets/images/peas.png';
 import beans from '../assets/images/red-beans.png';
 import okra from '../assets/images/okra.png';
 import brussels from '../assets/images/brussels-sprouts.png';
@@ -39,6 +38,7 @@ import mint from '../assets/images/mint.png';
 import rosemary from '../assets/images/rosemary.png';
 import thyme from '../assets/images/thyme.png';
 import tomatoCherry from '../assets/images/cherry-tomato.png';
+import corn from '../assets/images/corn .png';
 
 export interface Plant {
     id: string;
