@@ -5,7 +5,7 @@ import App from './App'
 import MainPage from './pages/MainPage.tsx'
 import ErrorPage from './pages/ErrorPage.tsx';
 import GardenPlanner from './pages/GardenPlanner.tsx'
-import Profile from './pages/Profile.tsx'
+import ProfilePage from './pages/Profile.tsx'
 
 console.log('Running MAIN.tsx')
 const router = createBrowserRouter([
@@ -24,7 +24,7 @@ const router = createBrowserRouter([
     },
     {
       path: '/profile',
-      element: <Profile />
+      element: <ProfilePage />
     },
     // {
     //   path: '/pest-control',

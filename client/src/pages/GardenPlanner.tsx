@@ -398,31 +398,13 @@ const GardenPlanner: React.FC = () => {
           <div className="garden-grid-container">
             <div 
               className="garden-grid" 
-              style={{ 
-                display: 'grid',
-                gridTemplateColumns: `repeat(${selectedPlotSize.cols}, 1fr)`,
-                gap: '4px',
-                backgroundColor: '#000',
-                padding: '4px',
-                maxWidth: `${Math.min(1000, selectedPlotSize.cols * 80)}px` 
-              }}
+              data-cols={selectedPlotSize.cols}
             >
               {garden.map((row, rowIndex) => (
                 row.map((cell, colIndex) => (
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     className="grid-cell"
-                    style={{
-                      position: 'relative',
-                      backgroundColor: 'white',
-                      border: '2px solid #000',
-                      minWidth: '75px',
-                      height: '75px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      padding: '2px'
-                    }}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                     onContextMenu={(e) => {
                       e.preventDefault();
