@@ -2,7 +2,7 @@ import { Disclosure, DisclosurePanel, DisclosureButton } from '@headlessui/react
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import AuthService from "../utils/authService";
-import '../styles/NavBar.css';
+import '../styles/navbar.css';
 
 const allNavigation = [
     { name: 'Home', href: '/', current: true },
