@@ -12,7 +12,6 @@ function MainPage() {
   const [isResetPasswordMode, setIsResetPasswordMode] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(AuthService.loggedIn());
   const navigate = useNavigate();
-  const token = localStorage.getItem("id_token");
 
   useEffect(() => {
     if (AuthService.loggedIn()) {
