@@ -114,6 +114,18 @@
     display: flex;
     gap: 16px;
   }
+
+  .nav-link-a {
+    background-color: var(--brand-primary);
+    color: var(--brand-text);
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .nav-link-a:hover {
+    background-color: var(--brand-secondary);
+  }
   
   .nav-link, .nav-link-active {
     border-radius: 6px;

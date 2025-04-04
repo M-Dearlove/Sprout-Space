@@ -1,6 +1,7 @@
 import { Disclosure, DisclosurePanel, DisclosureButton } from '@headlessui/react';
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import AuthService from "../utils/authService";
 import '../styles/NavBar.css';
 
 const allNavigation = [
@@ -8,6 +9,7 @@ const allNavigation = [
     { name: 'Garden Planner', href: '/garden-planner', current: false },
     { name: 'Pest Control', href: '/pest-control', current: false },
     { name: 'Profile', href: '/profile', current: false },
+    { name: 'Logout', href: '/logout', current: false },
 ];
 
 function classNames(...classes: string[]) {
@@ -16,6 +18,8 @@ function classNames(...classes: string[]) {
 
 export default function NavBar() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(AuthService.loggedIn());
     const [navigation, setNavigation] = useState(
         allNavigation.map(item => ({
             ...item,
@@ -46,6 +50,12 @@ export default function NavBar() {
             ]);
         }
     }, [location.pathname]);
+
+    const handleLogout = () => {
+        AuthService.logout();
+        setIsLoggedIn(false);
+        navigate('/'); // Navigate to home page after logout
+    };
 
     return (
         <Disclosure as="nav" className="navbar">
@@ -79,16 +89,26 @@ export default function NavBar() {
                                 <div className="desktop-nav">
                                     <div className="nav-links">
                                         {navigation.map((item) => (
-                                            <Link
-                                                key={item.name}
-                                                to={item.href}
-                                                className={classNames(
-                                                    location.pathname === item.href ? 'nav-link-active' : 'nav-link',
-                                                )}
-                                                aria-current={location.pathname === item.href ? 'page' : undefined}
-                                            >
-                                                {item.name}
-                                            </Link>
+                                            item.name === 'Logout' ? (
+                                                <button
+                                                    key={item.name}
+                                                    onClick={handleLogout}
+                                                    className="nav-link-a"
+                                                >
+                                                    {item.name}
+                                                </button>
+                                            ) : (
+                                                <Link
+                                                    key={item.name}
+                                                    to={item.href}
+                                                    className={classNames(
+                                                        location.pathname === item.href ? 'nav-link-active' : 'nav-link',
+                                                    )}
+                                                    aria-current={location.pathname === item.href ? 'page' : undefined}
+                                                >
+                                                    {item.name}
+                                                </Link>
+                                            )
                                         ))}
                                     </div>
                                 </div>
@@ -102,24 +122,35 @@ export default function NavBar() {
                             {navigation.map((item) => (
                                 <div key={item.name}>
                                     <DisclosureButton as="div">
-                                        <Link
-                                            to={item.href}
-                                            className={classNames(
-                                                location.pathname === item.href ? 'mobile-nav-link-active' : 'mobile-nav-link',
-                                            )}
-                                            aria-current={location.pathname === item.href ? 'page' : undefined}
-                                        >
-                                            {item.name}
-                                        </Link>
+                                        {item.name === 'Logout' ? (
+                                            <button
+                                                onClick={handleLogout}
+                                                className="mobile-nav-link"
+                                            >
+                                                {item.name}
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                to={item.href}
+                                                className={classNames(
+                                                    location.pathname === item.href ? 'mobile-nav-link-active' : 'mobile-nav-link',
+                                                )}
+                                                aria-current={location.pathname === item.href ? 'page' : undefined}
+                                            >
+                                                {item.name}
+                                            </Link>
+                                        )}
                                     </DisclosureButton>
                                 </div>
                             ))}
 
-                            <div className="signup-button-container">
-                                <button type="button" className="signup-button">
-                                    Sign Up
-                                </button>
-                            </div>
+                            {!isLoggedIn && (
+                                <div className="signup-button-container">
+                                    <button type="button" className="signup-button">
+                                        Sign Up
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </DisclosurePanel>
                 </>
