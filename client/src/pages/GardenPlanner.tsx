@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import '../styles/Gardenplanner.css';
+import '../styles/GardenPlanner.css';
 import axios from 'axios';
+import defaultPlantTypes, { Plant } from '../utils/plantData';
 
 // Define interfaces
-interface Plant {
+interface LocalPlant {
   id: string;
   name: string;
   color: string;
@@ -12,6 +13,8 @@ interface Plant {
   spacing: number;
   sunlight: string;
   water: string;
+  plantsPerSquareFoot: number; // New property to track plants per square foot
+  image?: string; // Optional image URL
 }
 
 interface PlotSize {
@@ -34,6 +37,15 @@ interface PerenualPlant {
   } | null;
 }
 
+// Calculate plants per square foot based on spacing
+const calculatePlantsPerSquareFoot = (spacing: number): number => {
+  if (spacing >= 18) return 0.5; // 1 plant per 2 squares
+  if (spacing >= 12) return 1;
+  if (spacing >= 6) return 4;
+  if (spacing >= 4) return 9;
+  return 16; // 3 inches or less spacing
+};
+
 // Get API key and URL from environment variables
 const PERENUAL_API_KEY = process.env.REACT_APP_PERENUAL_API_KEY || '';
 const PERENUAL_API_BASE_URL = process.env.REACT_APP_PERENUAL_API_URL || 'https://perenual.com/api';
@@ -41,79 +53,25 @@ const PERENUAL_API_BASE_URL = process.env.REACT_APP_PERENUAL_API_URL || 'https:/
 const GardenPlanner: React.FC = () => {
   // Available plot sizes
   const plotSizes: PlotSize[] = [
+    { id: 'xxxs', name: 'Extra Extra Extra Small (1 x 1)', rows: 1, cols: 1 },
+    { id: 'xxs', name: 'Extra Extra Small (2 x 2)', rows: 2, cols: 2 },
+    { id: 'xs', name: 'Extra Small (3 x 3)', rows: 3, cols: 3 },
+    { id: 'xs', name: 'Extra Small (4 x 4)', rows: 4, cols: 4 },
     { id: 'small', name: 'Small (6 x 6)', rows: 6, cols: 6 },
     { id: 'medium', name: 'Medium (10 x 10)', rows: 10, cols: 10 },
     { id: 'large', name: 'Large (12 x 12)', rows: 12, cols: 12 },
-    { id: 'xl', name: 'Extra Large (15 x 15)', rows: 15, cols: 15 },
-    { id: 'custom1', name: 'Rectangular (8 x 12)', rows: 8, cols: 12 },
-    { id: 'custom2', name: 'Rectangular (12 x 8)', rows: 12, cols: 8 },
+
   ];
   
-  // Default plant types
-  const defaultPlantTypes: Plant[] = [
-    { id: 'tomato', name: 'Tomato', color: '#e77c7c', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'carrot', name: 'Carrot', color: '#e9a978', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'lettuce', name: 'Lettuce', color: '#8dd8b9', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Regular' },
-    { id: 'cucumber', name: 'Cucumber', color: '#78c2a4', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'zucchini', name: 'Zucchini', color: '#7fb3da', width: 2, height: 2, spacing: 3, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'sunflower', name: 'Sunflower', color: '#ecd279', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'basil', name: 'Basil', color: '#97c283', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Moderate' },
-    { id: 'pepper', name: 'Pepper', color: '#e28b89', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Moderate' },
-    
-    // Additional vegetables
-    { id: 'broccoli', name: 'Broccoli', color: '#89bb9e', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'cauliflower', name: 'Cauliflower', color: '#e0e0e0', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'onion', name: 'Onion', color: '#b8c4d0', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'garlic', name: 'Garlic', color: '#d5d8dd', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Low' },
-    { id: 'potato', name: 'Potato', color: '#c4b396', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'sweetPotato', name: 'Sweet Potato', color: '#d49c82', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'pumpkin', name: 'Pumpkin', color: '#e2a173', width: 3, height: 3, spacing: 4, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'corn', name: 'Corn', color: '#e6d7a1', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Regular' },
-    
-    // Leafy greens
-    { id: 'spinach', name: 'Spinach', color: '#a1d6a1', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Regular' },
-    { id: 'kale', name: 'Kale', color: '#9cb6da', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'swissChard', name: 'Swiss Chard', color: '#a1b5c4', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Regular' },
-    { id: 'arugula', name: 'Arugula', color: '#a7d8ad', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Regular' },
-    
-    // Beans and peas
-    { id: 'greenBean', name: 'Green Bean', color: '#77b580', width: 1, height: 2, spacing: 1, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'pea', name: 'Pea', color: '#b6cf9b', width: 1, height: 2, spacing: 1, sunlight: 'Partial shade', water: 'Moderate' },
-    { id: 'lima', name: 'Lima Bean', color: '#d8e0a3', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Moderate' },
-    
-    // Root vegetables
-    { id: 'radish', name: 'Radish', color: '#d99a9a', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Regular' },
-    { id: 'turnip', name: 'Turnip', color: '#d0d5dd', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'beet', name: 'Beet', color: '#b793c1', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'parsnip', name: 'Parsnip', color: '#e7e7e0', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Regular' },
-    
-    // Herbs
-    { id: 'cilantro', name: 'Cilantro', color: '#a6d0b1', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Moderate' },
-    { id: 'mint', name: 'Mint', color: '#c1dbae', width: 1, height: 1, spacing: 2, sunlight: 'Partial shade', water: 'Regular' },
-    { id: 'rosemary', name: 'Rosemary', color: '#a3afb9', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Low' },
-    { id: 'thyme', name: 'Thyme', color: '#b4c2cc', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Low' },
-    { id: 'oregano', name: 'Oregano', color: '#a6b0b1', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Low' },
-    
-    // Flowers and companion plants
-    { id: 'marigold', name: 'Marigold', color: '#e6c187', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'nasturtium', name: 'Nasturtium', color: '#e0a989', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Moderate' },
-    { id: 'lavender', name: 'Lavender', color: '#bba6d7', width: 1, height: 1, spacing: 2, sunlight: 'Full sun', water: 'Low' },
-    { id: 'chamomile', name: 'Chamomile', color: '#e9e2c0', width: 1, height: 1, spacing: 1, sunlight: 'Partial shade', water: 'Moderate' },
-    
-    // Fruits
-    { id: 'strawberry', name: 'Strawberry', color: '#da9197', width: 1, height: 1, spacing: 1, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'blackberry', name: 'Blackberry', color: '#7c8591', width: 1, height: 2, spacing: 3, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'raspberry', name: 'Raspberry', color: '#d7a0af', width: 1, height: 2, spacing: 3, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'melon', name: 'Melon', color: '#a8d9b7', width: 2, height: 2, spacing: 3, sunlight: 'Full sun', water: 'Regular' },
-    { id: 'blueberry', name: 'Blueberry', color: '#90a1d6', width: 1, height: 2, spacing: 3, sunlight: 'Full sun', water: 'Regular' },
-  ];
+
+
   // State
   const [selectedPlotSize, setSelectedPlotSize] = useState<PlotSize>(plotSizes[1]); // Default to medium
   const [garden, setGarden] = useState<(Plant | null)[][]>([]);
-  const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
+  const [selectedPlant, setSelectedPlant] = useState<LocalPlant | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [plantTypes, setPlantTypes] = useState<Plant[]>(defaultPlantTypes);
-  const [searchResults, setSearchResults] = useState<Plant[]>([]);
+  const [plantTypes, setPlantTypes] = useState<LocalPlant[]>(defaultPlantTypes);
+  const [searchResults, setSearchResults] = useState<LocalPlant[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
   
@@ -173,17 +131,22 @@ const GardenPlanner: React.FC = () => {
             const colors = ['#ff6b6b', '#ff9f43', '#1dd1a1', '#10ac84', '#2e86de', '#f9ca24', '#6ab04c', '#eb4d4b'];
             const color = colors[plant.id % colors.length];
             
+            // Default spacing (can be adjusted)
+            const spacing = 12;
+           
             const mappedPlant = {
               id: `api-${plant.id}`,
               name: plant.common_name,
               color: color,
               width: 1,
               height: 1,
-              spacing: 2, // Default spacing
+              spacing: spacing,
+              plantsPerSquareFoot: calculatePlantsPerSquareFoot(spacing), // Calculate based on spacing
               sunlight: Array.isArray(plant.sunlight) && plant.sunlight.length > 0 
                 ? plant.sunlight.join(', ') 
                 : 'Unknown',
-              water: plant.watering || 'Unknown'
+              water: plant.watering || 'Unknown',
+              image: 'https://cdn-icons-png.flaticon.com/128/628/628324.png' // Default plant icon
             };
             
             return mappedPlant;
@@ -270,7 +233,10 @@ const GardenPlanner: React.FC = () => {
     
     // Create a new garden grid with the selected plant placed
     const newGarden = [...garden];
-    newGarden[rowIndex][colIndex] = { ...selectedPlant };
+    newGarden[rowIndex][colIndex] = { 
+      ...selectedPlant, 
+      image: selectedPlant.image || '' // Ensure image is a string
+    };
     setGarden(newGarden);
   };
   
@@ -303,10 +269,15 @@ const GardenPlanner: React.FC = () => {
     !searchTerm || plant.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Print garden plan
+  const handlePrintGarden = () => {
+    window.print();
+  };
+
   return (
     <div className="garden-planner">
-      <h1>Garden Planner</h1>
-      
+      <h1>Square Foot Garden Planner</h1>
+      <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
       <div className="garden-layout">
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
@@ -344,16 +315,19 @@ const GardenPlanner: React.FC = () => {
                     <div 
                       key={plant.id}
                       className="search-result-item"
-                      onClick={() => addPlantToPalette(plant)}
+                      onClick={() => addPlantToPalette({ ...plant, image: plant.image || '' })}
                     >
-                      <div 
-                        className="result-color" 
-                        style={{ backgroundColor: plant.color }}
-                      ></div>
+                      <div className="result-image-container">
+                        <img 
+                          src={plant.image} 
+                          alt={plant.name}
+                          className="result-image"
+                        />
+                      </div>
                       <div className="result-details">
                         <div className="result-name">{plant.name}</div>
                         <div className="result-info">
-                          Water: {plant.water}, Sunlight: {plant.sunlight}
+                          Plants per sq ft: {plant.plantsPerSquareFoot}
                         </div>
                       </div>
                     </div>
@@ -388,14 +362,26 @@ const GardenPlanner: React.FC = () => {
             >
               Clear Garden
             </button>
+            <button
+              className="print-button"
+              onClick={handlePrintGarden}
+            >
+              Print Garden Plan
+            </button>
           </div>
           
           {/* Selected Plant Info */}
           {selectedPlant && (
             <div className="selected-plant-info">
-              <h3>Selected: {selectedPlant.name}</h3>
+              <div className="selected-plant-header">
+                <div className="selected-plant-image">
+                  <img src={selectedPlant.image} alt={selectedPlant.name} />
+                </div>
+                <h3>Selected: {selectedPlant.name}</h3>
+              </div>
               <div className="plant-quick-info">
-                <span>Spacing: {selectedPlant.spacing} ft</span> | 
+                <span>Spacing: {selectedPlant.spacing} inches</span> | 
+                <span>Plants per square foot: {selectedPlant.plantsPerSquareFoot}</span> | 
                 <span>Sunlight: {selectedPlant.sunlight}</span> | 
                 <span>Water: {selectedPlant.water}</span>
               </div>
@@ -405,12 +391,20 @@ const GardenPlanner: React.FC = () => {
         
         {/* Garden Grid (main content) */}
         <div className="garden-area">
+          <div className="garden-title-print">
+            <h3>Square Foot Garden Plan</h3>
+            <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet</p>
+          </div>
           <div className="garden-grid-container">
             <div 
               className="garden-grid" 
               style={{ 
+                display: 'grid',
                 gridTemplateColumns: `repeat(${selectedPlotSize.cols}, 1fr)`,
-                maxWidth: `${Math.min(800, selectedPlotSize.cols * 50)}px` 
+                gap: '4px',
+                backgroundColor: '#000',
+                padding: '4px',
+                maxWidth: `${Math.min(1000, selectedPlotSize.cols * 80)}px` 
               }}
             >
               {garden.map((row, rowIndex) => (
@@ -418,6 +412,17 @@ const GardenPlanner: React.FC = () => {
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     className="grid-cell"
+                    style={{
+                      position: 'relative',
+                      backgroundColor: 'white',
+                      border: '2px solid #000',
+                      minWidth: '75px',
+                      height: '75px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '2px'
+                    }}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                     onContextMenu={(e) => {
                       e.preventDefault();
@@ -427,9 +432,44 @@ const GardenPlanner: React.FC = () => {
                     {cell && (
                       <div
                         className="plant-in-grid"
-                        style={{ backgroundColor: cell.color }}
+                        style={{ 
+                          width: '100%',
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          position: 'relative',
+                          textAlign: 'center'
+                        }}
                       >
-                        <span>{cell.name[0]}</span>
+                        <div className="plant-image-container" style={{ position: 'relative' }}>
+                          <img 
+                            src={cell.image} 
+                            alt={cell.name}
+                            style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                          />
+                          <div style={{ 
+                            position: 'absolute', 
+                            top: '-5px', 
+                            right: '-5px', 
+                            backgroundColor: 'black',
+                            color: 'white',
+                            width: '20px',
+                            height: '20px',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            fontWeight: 'bold'
+                          }}>
+                            {cell.plantsPerSquareFoot}
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '4px' }}>
+                          {cell.name}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -440,41 +480,118 @@ const GardenPlanner: React.FC = () => {
           
           <div className="grid-info">
             <p>Left click to place a plant. Right click to remove.</p>
-            <p>Grid size: {selectedPlotSize.rows} x {selectedPlotSize.cols} feet</p>
+            <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet (Each square = 1 sq ft)</p>
           </div>
         </div>
         
         {/* Plant Selection (bottom) */}
         <div className="plant-selection-bottom">
-          <div className="plant-items">
+          <div className="plant-items" style={{ 
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px'
+          }}>
             {filteredPlants.map((plant) => (
               <div
                 key={plant.id}
                 className={`plant-item ${selectedPlant?.id === plant.id ? 'plant-item-selected' : ''}`}
-                style={{ backgroundColor: plant.color }}
-                onClick={() => handlePlantSelect(plant)}
+                style={{ 
+                  backgroundColor: 'white', 
+                  border: selectedPlant?.id === plant.id ? '2px solid #4CAF50' : '1px solid #ddd',
+                  borderRadius: '4px',
+                  padding: '5px',
+                  width: '80px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  cursor: 'pointer'
+                }}
+                onClick={() => handlePlantSelect({ ...plant, image: plant.image || '' })}
               >
-                <span>{plant.name}</span>
+                <img 
+                  src={plant.image} 
+                  alt={plant.name}
+                  style={{ width: '30px', height: '30px', marginBottom: '4px' }}
+                />
+                <span style={{ fontSize: '12px', textAlign: 'center' }}>{plant.name}</span>
+                <div className="plant-per-foot" style={{ 
+                  fontSize: '10px', 
+                  color: '#666',
+                  backgroundColor: '#f0f0f0',
+                  padding: '2px 5px',
+                  borderRadius: '10px',
+                  marginTop: '2px'
+                }}>
+                  {plant.plantsPerSquareFoot} per sq ft
+                </div>
               </div>
             ))}
           </div>
           
           <div className="legend">
             <h3>Legend</h3>
-            <div className="legend-items">
-              {plantTypes.map((plant) => (
-                <div key={plant.id} className="legend-item">
-                  <div 
-                    className="legend-color" 
-                    style={{ backgroundColor: plant.color }}
-                  ></div>
-                  <span>{plant.name} (spacing: {plant.spacing}')</span>
-                </div>
-              ))}
+            <div className="legend-items" style={{ 
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px'
+            }}>
+              {/* Only show used plants in the legend */}
+              {Array.from(new Set(garden.flat().filter(Boolean).map(plant => plant?.id)))
+                .map(id => {
+                  const plant = plantTypes.find(p => p.id === id);
+                  if (!plant) return null;
+                  
+                  return (
+                    <div key={plant.id} className="legend-item" style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      padding: '5px',
+                      backgroundColor: 'white',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px'
+                    }}>
+                      <img 
+                        src={plant.image} 
+                        alt={plant.name}
+                        style={{ width: '25px', height: '25px', marginRight: '8px' }}
+                      />
+                      <div>
+                        <div style={{ fontWeight: 'bold' }}>{plant.name}</div>
+                        <div style={{ fontSize: '12px', color: '#666' }}>
+                          {plant.plantsPerSquareFoot} plants per square foot
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
       </div>
+      <style>
+        {`
+        @media print {
+          .garden-controls, .search-container, .plant-selection-bottom, .clear-button, .print-button {
+            display: none !important;
+          }
+          
+          .garden-title-print {
+            display: block !important;
+            text-align: center;
+            margin-bottom: 20px;
+          }
+          
+          .grid-info {
+            margin-top: 20px;
+          }
+          
+          @page {
+            size: landscape;
+            margin: 1cm;
+          }
+        }
+        `}
+      </style>
     </div>
   );
 };

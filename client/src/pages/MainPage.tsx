@@ -21,6 +21,7 @@ function MainPage() {
 
 
 
+
   // useEffect(() => {
   //   if (isLoggedIn) {
   //     navigate("/");
@@ -31,6 +32,7 @@ function MainPage() {
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
     // navigate("/garden-planner");
+
   };
 
   const handleLogout = () => {
@@ -44,6 +46,7 @@ function MainPage() {
       <div className="top-image">
         <img src={heading} alt="Woman Gardening" className="heading" />
       </div>
+
       <div className="content-container">
         <div className="left-side">
           <div className="text-container">
@@ -70,6 +73,7 @@ function MainPage() {
                   <ResetPassword
                     onCancel={() => setIsResetPasswordMode(false)}
                     onSuccess={() => {
+
                       setIsResetPasswordMode(false);
                       setIsLoginMode(true);
                     }}
