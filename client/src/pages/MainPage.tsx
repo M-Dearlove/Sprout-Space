@@ -20,18 +20,11 @@ function MainPage() {
   }, []);
 
 
-
-
-  // useEffect(() => {
-  //   if (isLoggedIn) {
-  //     navigate("/");
-  //   }
-  // }, [isLoggedIn, navigate]);
   
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    // navigate("/garden-planner");
+
 
   };
 

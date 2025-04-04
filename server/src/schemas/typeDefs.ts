@@ -2,6 +2,8 @@
 const typeDefs = `
   type User {
     _id: ID!
+    firstname: String!
+    lastname: String!
     email: String!
     token: String
   }
@@ -16,7 +18,7 @@ const typeDefs = `
   }
 
   type Mutation {
-    register(email: String!, password: String!): AuthPayload
+    register(firstname:  String! lastname: String! email: String!, password: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
     resetPassword(email: String!, newPassword: String!): Boolean
   }
