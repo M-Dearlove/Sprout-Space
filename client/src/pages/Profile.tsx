@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client';
-import { QUERY_ME } from '../graphQL/queries'; 
+import { QUERY_ME } from '../graphQL/queries';
+import '../styles/Profile.css';
 
 const ProfilePage = () => {
   const { loading, error, data } = useQuery(QUERY_ME);
@@ -13,21 +14,25 @@ const ProfilePage = () => {
 
   return (
     // Main container
-    <div>
+    <div className="profilePage-container">
+      <div className="profile-container">
         {/* Header Container*/}
-        <div>
-            <h1>{firstname}'s Garden Plans</h1>
-            <p>"The glory of gardening: hands in the dirt, head in the sun, heart with nature." - Alfred Austin </p>
+        <div className="profile-header">
+          <h1>{firstname}'s Garden Plans</h1>
+          <p>"The glory of gardening: hands in the dirt, head in the sun, heart with nature." - Alfred Austin </p>
         </div>
-        {/* Garden Plots Container */}
-        {gardenPlotTemp ? (
-          <div>
-          <p>Plot 1</p>
-          <p>Plot 2</p>
+        <div className="savedPlot-container">
+          {/* Garden Plots Container */}
+          {gardenPlotTemp ? (
+            <div>
+              <p>Plot 1</p>
+              <p>Plot 2</p>
+            </div>
+          ) : (
+            <p>You have no garden plots saved</p>
+          )}
         </div>
-        ) : (
-          <p>You have no garden plots saved</p>
-        )}
+      </div>
     </div>
   )
 }
