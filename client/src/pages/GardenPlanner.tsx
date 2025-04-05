@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Gardenplanner.css';
-import axios from 'axios';
 import defaultPlantTypes, { Plant } from '../utils/plantData';
+import { useQuery, useMutation, gql } from '@apollo/client';
+import '../styles/Gardensave.css'
 
 // Define interfaces
 interface LocalPlant {
@@ -13,8 +14,8 @@ interface LocalPlant {
   spacing: number;
   sunlight: string;
   water: string;
-  plantsPerSquareFoot: number; // New property to track plants per square foot
-  image?: string; // Optional image URL
+  plantsPerSquareFoot: number;
+  image?: string;
 }
 
 interface PlotSize {
@@ -24,18 +25,33 @@ interface PlotSize {
   cols: number;
 }
 
-// Perenual API plant interface
-interface PerenualPlant {
-  id: number;
-  common_name: string;
-  scientific_name: string[];
-  cycle: string;
-  watering: string;
-  sunlight: string[];
-  default_image: {
-    thumbnail: string;
-  } | null;
-}
+// GraphQL queries and mutations
+const SEARCH_PLANTS_QUERY = gql`
+  query SearchPlants($searchTerm: String!, $limit: Int) {
+    searchPlants(searchTerm: $searchTerm, limit: $limit) {
+      id
+      commonName
+      scientificName
+      cycle
+      watering
+      sunlight
+      defaultImage {
+        thumbnail
+      }
+    }
+  }
+`;
+
+const SAVE_GARDEN_MUTATION = gql`
+  mutation SaveGarden($name: String!, $rows: Int!, $cols: Int!, $plants: [PlantPlacementInput!]!) {
+    saveGarden(name: $name, rows: $rows, cols: $cols, plants: $plants) {
+      id
+      name
+      rows
+      cols
+    }
+  }
+`;
 
 // Calculate plants per square foot based on spacing
 const calculatePlantsPerSquareFoot = (spacing: number): number => {
@@ -46,27 +62,20 @@ const calculatePlantsPerSquareFoot = (spacing: number): number => {
   return 16; // 3 inches or less spacing
 };
 
-// Get API key and URL from environment variables
-const PERENUAL_API_KEY = process.env.REACT_APP_PERENUAL_API_KEY || '';
-const PERENUAL_API_BASE_URL = process.env.REACT_APP_PERENUAL_API_URL || 'https://perenual.com/api';
-
 const GardenPlanner: React.FC = () => {
   // Available plot sizes
   const plotSizes: PlotSize[] = [
     { id: 'xxxs', name: 'Extra Extra Extra Small (1 x 1)', rows: 1, cols: 1 },
     { id: 'xxs', name: 'Extra Extra Small (2 x 2)', rows: 2, cols: 2 },
-    { id: 'xs', name: 'Extra Small (3 x 3)', rows: 3, cols: 3 },
-    { id: 'xs', name: 'Extra Small (4 x 4)', rows: 4, cols: 4 },
+    { id: 'xs1', name: 'Extra Small (3 x 3)', rows: 3, cols: 3 },
+    { id: 'xs2', name: 'Extra Small (4 x 4)', rows: 4, cols: 4 },
     { id: 'small', name: 'Small (6 x 6)', rows: 6, cols: 6 },
     { id: 'medium', name: 'Medium (10 x 10)', rows: 10, cols: 10 },
     { id: 'large', name: 'Large (12 x 12)', rows: 12, cols: 12 },
-
   ];
-  
-
 
   // State
-  const [selectedPlotSize, setSelectedPlotSize] = useState<PlotSize>(plotSizes[1]); // Default to medium
+  const [selectedPlotSize, setSelectedPlotSize] = useState<PlotSize>(plotSizes[1]); // Default to xxs
   const [garden, setGarden] = useState<(Plant | null)[][]>([]);
   const [selectedPlant, setSelectedPlant] = useState<LocalPlant | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,120 +83,87 @@ const GardenPlanner: React.FC = () => {
   const [searchResults, setSearchResults] = useState<LocalPlant[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
-  
+  const [executeSearch, setExecuteSearch] = useState(false);
+  const [gardenName, setGardenName] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState('');
+  const [saveError, setSaveError] = useState('');
+  const [showSaveDialog, setShowSaveDialog] = useState(false);
+
   // Initialize garden grid when plot size changes
   useEffect(() => {
     setGarden(
       Array(selectedPlotSize.rows).fill(null).map(() => Array(selectedPlotSize.cols).fill(null))
     );
   }, [selectedPlotSize]);
-  
-  // Function to search for plants using Perenual API
-  const searchPlants = async () => {
-    if (!searchTerm.trim()) {
-      setSearchResults([]);
-      return;
-    }
 
-    // Check if API key is available
-    if (!PERENUAL_API_KEY) {
-      console.error('Perenual API key is missing');
-      setSearchError('API key is missing. Check your environment variables.');
-      return;
-    }
-
-    setIsSearching(true);
-    setSearchError('');
-    
-    // Log for debugging
-    console.log(`Searching for: "${searchTerm}" using Perenual API`);
-    console.log(`API Key: ${PERENUAL_API_KEY.substring(0, 4)}...`);
-    console.log(`API Base URL: ${PERENUAL_API_BASE_URL}`);
-    
-    try {
-      const apiUrl = `${PERENUAL_API_BASE_URL}/species-list`;
-      console.log(`Full API URL: ${apiUrl}`);
+  // GraphQL query for searching plants
+  const { error, refetch } = useQuery(SEARCH_PLANTS_QUERY, {
+    variables: { searchTerm, limit: 8 },
+    skip: !executeSearch || !searchTerm.trim(),
+    onCompleted: (data) => {
+      setExecuteSearch(false);
+      setIsSearching(false);
       
-      const response = await axios.get(apiUrl, {
-        params: {
-          key: PERENUAL_API_KEY,
-          q: searchTerm,
-          page: 1,
-          page_size: 8 // Limit results for better performance
-        }
-      });
-      
-      console.log('API response status:', response.status);
-      
-      if (response.data && response.data.data && Array.isArray(response.data.data)) {
-        if (response.data.data.length === 0) {
-          console.log('No results found');
-          setSearchError('No plants found matching your search.');
-          setSearchResults([]);
-        } else {
-          // Convert API plants to our plant format
-          const apiPlants: Plant[] = response.data.data.map((plant: PerenualPlant) => {
-            // Generate a color based on plant id
-            const colors = ['#ff6b6b', '#ff9f43', '#1dd1a1', '#10ac84', '#2e86de', '#f9ca24', '#6ab04c', '#eb4d4b'];
-            const color = colors[plant.id % colors.length];
-            
-            // Default spacing (can be adjusted)
-            const spacing = 12;
-           
-            const mappedPlant = {
-              id: `api-${plant.id}`,
-              name: plant.common_name,
-              color: color,
-              width: 1,
-              height: 1,
-              spacing: spacing,
-              plantsPerSquareFoot: calculatePlantsPerSquareFoot(spacing), // Calculate based on spacing
-              sunlight: Array.isArray(plant.sunlight) && plant.sunlight.length > 0 
-                ? plant.sunlight.join(', ') 
-                : 'Unknown',
-              water: plant.watering || 'Unknown',
-              image: 'https://cdn-icons-png.flaticon.com/128/628/628324.png' // Default plant icon
-            };
-            
-            return mappedPlant;
-          });
+      if (data && data.searchPlants && data.searchPlants.length > 0) {
+        // Convert GraphQL plants to our plant format
+        const graphqlPlants: LocalPlant[] = data.searchPlants.map((plant: any) => {
+          // Generate a color based on plant id
+          const colors = ['#ff6b6b', '#ff9f43', '#1dd1a1', '#10ac84', '#2e86de', '#f9ca24', '#6ab04c', '#eb4d4b'];
+          const plantId = parseInt(plant.id);
+          const color = colors[plantId % colors.length];
           
-          console.log(`Found ${apiPlants.length} plants from API`);
-          setSearchResults(apiPlants);
-        }
-      } else {
-        console.error('Unexpected API response structure:', response.data);
-        setSearchResults([]);
-        setSearchError('Unexpected response from plant database. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error searching plants:', error);
-      
-      // Enhanced error logging
-      if (axios.isAxiosError(error)) {
-        console.error('API error details:', {
-          message: error.message,
-          status: error.response?.status,
-          statusText: error.response?.statusText
+          // Default spacing (can be adjusted)
+          const spacing = 12;
+         
+          return {
+            id: `gql-${plant.id}`,
+            name: plant.commonName,
+            color: color,
+            width: 1,
+            height: 1,
+            spacing: spacing,
+            plantsPerSquareFoot: calculatePlantsPerSquareFoot(spacing),
+            sunlight: Array.isArray(plant.sunlight) && plant.sunlight.length > 0 
+              ? plant.sunlight.join(', ') 
+              : 'Unknown',
+            water: plant.watering || 'Unknown',
+            image: plant.defaultImage?.thumbnail || 'https://cdn-icons-png.flaticon.com/128/628/628324.png'
+          };
         });
         
-        if (error.response?.status === 401) {
-          setSearchError('API key error: Please check your Perenual API key.');
-        } else if (error.response?.status === 429) {
-          setSearchError('Rate limit exceeded. Please try again later.');
-        } else {
-          setSearchError(`Error searching plants: ${error.message}. Please try again.`);
-        }
+        setSearchResults(graphqlPlants);
       } else {
-        setSearchError('Unknown error searching plants. Please try again.');
+        setSearchError('No plants found matching your search.');
+        setSearchResults([]);
       }
+    }
+  });
+
+  // GraphQL mutation for saving gardens
+  const [saveGarden, { loading: saveLoading }] = useMutation(SAVE_GARDEN_MUTATION, {
+    onCompleted: (data) => {
+      setSaveSuccess(`Garden "${data.saveGarden.name}" saved successfully!`);
+      setShowSaveDialog(false);
       
-      setSearchResults([]);
-    } finally {
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSaveSuccess('');
+      }, 3000);
+    },
+    onError: (err) => {
+      setSaveError(`Error saving garden: ${err.message}`);
+    }
+  });
+
+  // Handle GraphQL errors
+  useEffect(() => {
+    if (error) {
+      console.error('GraphQL error:', error);
+      setSearchError(`Error searching plants: ${error.message}. Please try again.`);
       setIsSearching(false);
     }
-  };
-  
+  }, [error]);
+
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -201,7 +177,17 @@ const GardenPlanner: React.FC = () => {
   // Handle search form submission
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    searchPlants();
+    if (!searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    setSearchError('');
+    setExecuteSearch(true);
+    
+    // Trigger the GraphQL query
+    refetch({ searchTerm, limit: 8 });
   };
   
   // Add a plant from search results to the palette
@@ -254,6 +240,7 @@ const GardenPlanner: React.FC = () => {
     setGarden(
       Array(selectedPlotSize.rows).fill(null).map(() => Array(selectedPlotSize.cols).fill(null))
     );
+    setGardenName('');
   };
 
   // Change plot size
@@ -264,20 +251,64 @@ const GardenPlanner: React.FC = () => {
     }
   };
 
-  // Filter plants based on local filtering (not API search)
-  const filteredPlants = plantTypes.filter(plant => 
-    !searchTerm || plant.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Handle garden name change
+  const handleGardenNameChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setGardenName(e.target.value);
+  };
+
+  // Open save dialog
+  const handleOpenSaveDialog = (): void => {
+    setSaveError('');
+    setShowSaveDialog(true);
+  };
+
+  // Handle garden save
+  const handleSaveGarden = (e: React.FormEvent): void => {
+    e.preventDefault();
+    
+    if (!gardenName.trim()) {
+      setSaveError('Please enter a name for your garden.');
+      return;
+    }
+    
+    // Format plants for the mutation
+    const plants = garden.flatMap((row, rowIndex) => 
+      row.flatMap((plant, colIndex) => 
+        plant ? [{ plantId: plant.id, row: rowIndex, col: colIndex }] : []
+      )
+    );
+    
+    // Execute the mutation
+    saveGarden({
+      variables: {
+        name: gardenName,
+        rows: selectedPlotSize.rows,
+        cols: selectedPlotSize.cols,
+        plants: plants
+      }
+    });
+  };
 
   // Print garden plan
   const handlePrintGarden = () => {
     window.print();
   };
 
+  // Filter plants based on local filtering (not GraphQL search)
+  const filteredPlants = plantTypes.filter(plant => 
+    !searchTerm || plant.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="garden-planner">
       <h1>Square Foot Garden Planner</h1>
       <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
+      
+      {/* Save Success Message */}
+      {saveSuccess && (
+        <div className="save-success">{saveSuccess}</div>
+      )}
+      
       <div className="garden-layout">
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
@@ -300,10 +331,10 @@ const GardenPlanner: React.FC = () => {
                 </button>
               </form>
               
-              {/* API Key Notice */}
-              {!PERENUAL_API_KEY && (
+              {/* GraphQL Endpoint Notice */}
+              {!import.meta.env.VITE_GRAPHQL_ENDPOINT && (
                 <div className="search-error">
-                  API key not found. Check your .env file.
+                  GraphQL endpoint not configured. Check your .env file.
                 </div>
               )}
               
@@ -356,6 +387,26 @@ const GardenPlanner: React.FC = () => {
               </select>
             </div>
             
+            {/* Garden name input */}
+            <div className="garden-name-input">
+              <input
+                type="text"
+                placeholder="Garden Name"
+                value={gardenName}
+                onChange={handleGardenNameChange}
+                className="garden-name-field"
+              />
+            </div>
+            
+            {/* Save Garden Button */}
+            <button
+              className="save-button"
+              onClick={handleOpenSaveDialog}
+              disabled={saveLoading}
+            >
+              {saveLoading ? "Saving..." : "Save Garden"}
+            </button>
+            
             <button
               className="clear-button"
               onClick={handleClearGarden}
@@ -392,7 +443,7 @@ const GardenPlanner: React.FC = () => {
         {/* Garden Grid (main content) */}
         <div className="garden-area">
           <div className="garden-title-print">
-            <h3>Square Foot Garden Plan</h3>
+            <h3>{gardenName || "Square Foot Garden Plan"}</h3>
             <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet</p>
           </div>
           <div className="garden-grid-container">
@@ -550,6 +601,55 @@ const GardenPlanner: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* Save Garden Dialog */}
+      {showSaveDialog && (
+        <div className="save-dialog-overlay">
+          <div className="save-dialog">
+            <h3>Save Your Garden</h3>
+            {saveError && <div className="save-error">{saveError}</div>}
+            
+            <form onSubmit={handleSaveGarden}>
+              <div className="form-group">
+                <label htmlFor="gardenName">Garden Name:</label>
+                <input
+                  type="text"
+                  id="gardenName"
+                  value={gardenName}
+                  onChange={handleGardenNameChange}
+                  placeholder="Enter a name for your garden"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <p>
+                  Size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet<br />
+                  Plants: {garden.flat().filter(Boolean).length}
+                </p>
+              </div>
+              
+              <div className="dialog-buttons">
+                <button 
+                  type="button" 
+                  className="cancel-button"
+                  onClick={() => setShowSaveDialog(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="save-confirm-button"
+                  disabled={saveLoading}
+                >
+                  {saveLoading ? "Saving..." : "Save Garden"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      
       <style>
         {`
         @media print {
@@ -571,6 +671,68 @@ const GardenPlanner: React.FC = () => {
             size: landscape;
             margin: 1cm;
           }
+        }
+        
+        /* Styles for save dialog */
+        .save-dialog-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+        }
+        
+        .save-dialog {
+          background-color: white;
+          padding: 20px;
+          border-radius: 8px;
+          width: 400px;
+          max-width: 90%;
+        }
+        
+        .save-error {
+          color: #dc3545;
+          margin-bottom: 15px;
+          padding: 8px;
+          background-color: #f8d7da;
+          border-radius: 4px;
+        }
+        
+        .save-success {
+          color: #28a745;
+          margin-bottom: 15px;
+          padding: 8px;
+          background-color: #d4edda;
+          border-radius: 4px;
+        }
+        
+        .dialog-buttons {
+          display: flex;
+          justify-content: flex-end;
+          gap: 10px;
+          margin-top: 20px;
+        }
+        
+        .form-group {
+          margin-bottom: 15px;
+        }
+        
+        .form-group label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: bold;
+        }
+        
+        .form-group input {
+          width: 100%;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
         }
         `}
       </style>
