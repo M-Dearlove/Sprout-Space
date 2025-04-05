@@ -3,20 +3,22 @@
 .garden-planner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
   font-family: Arial, sans-serif;
   background-color: var(--brand-secondary);
+  overflow-x: hidden;
 }
 
 .garden-planner h1 {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--brand-text);
+  font-size: 1.5rem;
 }
 
 .intro-text {
-  margin-bottom: 20px;
+  margin-bottom: 15px;
   color: var(--brand-text);
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .garden-layout {
@@ -28,7 +30,7 @@
 /* Controls Section */
 .garden-controls {
   background-color: var(--brand-primary);
-  padding: 15px;
+  padding: 10px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -36,14 +38,14 @@
 .controls-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 /* Search Component */
 .search-container {
   flex: 1;
-  min-width: 300px;
+  min-width: 100%;
 }
 
 .search-form {
@@ -52,17 +54,18 @@
 
 .search-input {
   flex: 1;
-  padding: 8px;
+  padding: 6px;
   border: 1px solid #ccc;
   border-radius: 8px 0 0 8px;
-  font-size: 14px;
+  font-size: 13px;
   background-color: #f0eded;
   color: var(--brand-text);
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .search-button {
-  padding: 8px 15px;
+  padding: 6px 12px;
+  min-height: 36px;
   background-color: var(--brand-accent-dark);
   color: var(--brand-text);
   border: none;
@@ -252,12 +255,12 @@
 
 .garden-grid {
   display: grid;
-  gap: 4px;
+  gap: 2px;
   background-color: var(--brand-accent);
-  padding: 4px;
+  padding: 2px;
   width: 100%;
   max-width: 1000px;
-  border-radius: 8px;
+  border-radius: 6px;
   margin: 0 auto;
 }
 
@@ -277,19 +280,23 @@
 .grid-cell {
   position: relative;
   background-color: white;
-  border: 2px solid #000;
+  border: 1px solid #000;
   aspect-ratio: 1;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: 1px;
   color: var(--brand-text);
   min-width: 0;
   min-height: 0;
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: 4px;
+  min-height: 40px;
+  min-width: 40px;
+  width: 100%;
+  max-width: 100%;
 }
 
 .grid-cell:hover {
@@ -400,16 +407,119 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
+@media (min-width: 480px) {
+  .garden-planner {
+    padding: 15px;
+  }
+  
+  .garden-planner h1 {
+    font-size: 1.8rem;
+  }
+  
+  .intro-text {
+    font-size: 15px;
+  }
+  
+  .garden-controls {
+    padding: 12px;
+  }
+  
   .controls-row {
-    flex-direction: column;
+    gap: 12px;
   }
   
-  .plant-items {
-    justify-content: center;
+  .search-container {
+    min-width: auto;
   }
   
-  .plant-item {
-    width: 70px !important;
+  .garden-grid {
+    gap: 3px;
+    padding: 3px;
+    border-radius: 7px;
+  }
+  
+  .grid-cell {
+    border: 1.5px solid #000;
+    padding: 1.5px;
+    border-radius: 6px;
+  }
+}
+
+@media (min-width: 768px) {
+  .garden-planner {
+    padding: 20px;
+  }
+  
+  .garden-planner h1 {
+    font-size: 2em;
+    margin-bottom: 10px;
+  }
+  
+  .intro-text {
+    margin-bottom: 20px;
+    font-size: 16px;
+  }
+  
+  .garden-controls {
+    padding: 15px;
+  }
+  
+  .controls-row {
+    gap: 15px;
+    margin-bottom: 15px;
+  }
+  
+  .search-input {
+    padding: 8px;
+    font-size: 14px;
+  }
+  
+  .search-button {
+    padding: 8px 15px;
+  }
+  
+  .garden-grid {
+    gap: 4px;
+    padding: 4px;
+    border-radius: 8px;
+  }
+  
+  .grid-cell {
+    border: 2px solid #000;
+    padding: 2px;
+    border-radius: 8px;
+  }
+}
+
+/* Add landscape orientation support */
+@media (max-width: 768px) and (orientation: landscape) {
+  .garden-grid-container {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .garden-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .search-container,
+  .plot-size-selector {
+    flex: 0 0 48%;
+  }
+}
+
+@media (max-width: 479px) {
+  .garden-grid {
+    gap: 2px;
+    padding: 2px;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .garden-grid-container {
+    overflow-x: auto;
+    margin-bottom: 15px;
   }
 }

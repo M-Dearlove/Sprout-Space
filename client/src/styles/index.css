@@ -15,6 +15,22 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  min-height: 100%;
+  height: auto;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+html {
+  font-size: 14px;
 }
 
 a {
@@ -30,13 +46,36 @@ body {
   margin: 0;
   display: block;
   min-width: 320px;
-  min-height: 100vh;
   background-color: var(--brand-secondary);
+  overflow-y: auto;
+  position: relative;
+  padding-bottom: env(safe-area-inset-bottom, .5rem);
+}
+
+html, body {
+  overflow-y: auto;
 }
 
 h1 {
-  font-size: 3.2em;
+  font-size: 2em;
   line-height: 1.1;
+}
+
+h2 {
+  font-size: 1.5em;
+  line-height: 1.2;
+}
+
+p {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.content-container, .text-container, .login-container, .profile-container, .savedPlot-container {
+  height: auto;
+  min-height: initial;
+  max-height: none;
+  overflow-y: visible;
 }
 
 @media (prefers-color-scheme: light) {
@@ -49,5 +88,48 @@ h1 {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+  
+  h1 {
+    font-size: 2.5em;
+  }
+}
+
+@media (min-width: 1024px) {
+  h1 {
+    font-size: 3.2em;
+  }
+}
+
+@media (max-width: 479px) {
+  html {
+    font-size: 12px;
+  }
+  
+  h1 {
+    font-size: 1.5em;
+  }
+  
+  h2 {
+    font-size: 1.2em;
+  }
+  
+  p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+@supports(padding: max(0px)) {
+  body {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
   }
 }
