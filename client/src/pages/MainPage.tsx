@@ -1,9 +1,8 @@
 import logo from "../assets/images/logo.png";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import LoginModal from "../components/LoginModal";
 import ResetPassword from "../components/ResetPassword";
 import AuthService from "../utils/authService";
+import LoginModal from "../components/LoginModal";
 import "../styles/MainPage.css";
 import heading from "../assets/images/heading.png";
 
@@ -11,7 +10,7 @@ function MainPage() {
   const [isLoginMode, setIsLoginMode] = useState<boolean>(true);
   const [isResetPasswordMode, setIsResetPasswordMode] = useState<boolean>(false);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(AuthService.loggedIn());
-  const navigate = useNavigate();
+
 
   useEffect(() => {
     if (AuthService.loggedIn()) {
@@ -21,13 +20,10 @@ function MainPage() {
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
+    console.log(isLoggedIn)
   };
 
-  const handleLogout = () => {
-    AuthService.logout();
-    setIsLoggedIn(false);
-    navigate("/"); // Navigate to home page after logout
-  };
+
 
   return (
     <main className="main-container">
@@ -47,20 +43,13 @@ function MainPage() {
         <div className="right-side">
           <img src={logo} alt="logo" className="logo" />
           <div className="login-container">
-            {isLoggedIn ? (
-              <button className="logout-btn" onClick={handleLogout}>
-                Logout
-              </button>
-            ) : (
-              <>
-                <h2>
+                 <h2>
                   {isResetPasswordMode ? "Reset Password" : isLoginMode ? "Welcome Back!" : "Create an Account"}
                 </h2>
                 {isResetPasswordMode ? (
                   <ResetPassword
                     onCancel={() => setIsResetPasswordMode(false)}
                     onSuccess={() => {
-
                       setIsResetPasswordMode(false);
                       setIsLoginMode(true);
                     }}
@@ -72,16 +61,13 @@ function MainPage() {
                     onForgotPassword={() => setIsResetPasswordMode(true)}
                   />
                 )}
-
                 <p>
                   {isLoginMode ? "Don't have an account? " : "Already have an account? "}
                   <span className="auth-toggle" onClick={() => setIsLoginMode(!isLoginMode)}>
                     {isLoginMode ? "Register Here" : "Login Here"}
                   </span>
                 </p>
-              </>
-            )}
-          </div>
+           </div>
         </div>
       </div>
     </main>
