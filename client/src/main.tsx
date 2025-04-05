@@ -26,10 +26,6 @@ const router = createBrowserRouter([
       path: '/profile',
       element: <ProfilePage />
     },
-    // {
-    //   path: '/pest-control',
-    //   element: <PestControl /> //??? 
-    // },
   ]
   }
 ]);
