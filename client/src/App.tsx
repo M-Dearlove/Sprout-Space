@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom"
 import NavBar from "./components/navbar"
 import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
+import Footer from "./components/Footer";
 
 //Set up HTTP connection to GraphQL server
 const httpLink = createHttpLink({
@@ -33,6 +34,7 @@ function App() {
       <main>
         <Outlet />
       </main>
+      <Footer />
     </>
     </ApolloProvider>
   )
