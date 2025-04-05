@@ -1,0 +1,19 @@
+.footer {
+    background-color: var(--brand-primary);
+    margin-top: 20px;
+}
+
+.footer-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--brand-text);
+    height: 64px;
+}
