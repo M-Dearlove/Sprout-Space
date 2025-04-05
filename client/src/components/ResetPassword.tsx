@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useMutation } from "@apollo/client";
 import { RESET_PASSWORD } from "../graphQL/mutations";
+import "../styles/ResetPassword.css";
 
 
 interface ResetPasswordProps {
@@ -47,28 +48,30 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onCancel, onSuccess }) =>
       {/* <h2>Reset Password</h2> */}
       {error && <p className="error-message">Error: {error.message}</p>}
       <div className="form-group">
-        <label>Email</label>
+        <label className="emailEntry">Email</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="emailForm"
         />
       </div>
       <div className="form-group">
-        <label>New Password</label>
+        <label className="newPasswordEntry">New Password</label>
         <input
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           required
+          className="newPasswordForm"
         />
       </div>
       <div className="button-group">
-        <button type="submit" className="btn btn-gray" disabled={loading}>
+        <button type="submit" className="resetButton" disabled={loading}>
           {loading ? "Resetting..." : "Reset Password"}
         </button>
-        <button type="button" className="btn btn-secondary" onClick={handleCancel}>
+        <button type="button" className="cancelButton" onClick={handleCancel}>
           Cancel
         </button>
       </div>

@@ -19,13 +19,8 @@ function MainPage() {
     }
   }, []);
 
-
-  
-
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-
-
   };
 
   const handleLogout = () => {
@@ -39,7 +34,6 @@ function MainPage() {
       <div className="top-image">
         <img src={heading} alt="Woman Gardening" className="heading" />
       </div>
-
       <div className="content-container">
         <div className="left-side">
           <div className="text-container">

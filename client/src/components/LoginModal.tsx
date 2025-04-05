@@ -98,7 +98,7 @@ useEffect(() => {
             <label>First Name:</label>
             <input
               type="text"
-              className="form-control-1"
+              className="form-control-3"
               value={firstname}
               onChange={(e) => setFirstname(e.target.value)}
               required
@@ -108,7 +108,7 @@ useEffect(() => {
             <label>Last Name:</label>
             <input
               type="text"
-              className="form-control-1"
+              className="form-control-3"
               value={lastname}
               onChange={(e) => setLastname(e.target.value)}
               required
