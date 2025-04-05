@@ -20,10 +20,8 @@ function MainPage() {
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    console.log(isLoggedIn)
+    console.log(isLoggedIn);
   };
-
-
 
   return (
     <main className="main-container">
