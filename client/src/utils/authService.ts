@@ -40,20 +40,20 @@ class AuthService {
 
   // This method retrieves the token from localStorage.
   getToken(): string {
-    const loggedUser = localStorage.getItem('id_token') || '';
+    const loggedUser = localStorage.getItem('token') || '';
     // Returns the token stored in localStorage.
     return loggedUser;
   }
 
   // This method logs in the user by storing the token in localStorage and redirecting to the home page.
   login(idToken: string) {
-    localStorage.setItem('id_token', idToken);
+    localStorage.setItem('token', idToken);
     window.location.assign('/');
   }
 
   // This method logs out the user by removing the token from localStorage and redirecting to the home page.
   logout() {
-    localStorage.removeItem('id_token');
+    localStorage.removeItem('token');
     window.location.assign('/');
   }
 }
