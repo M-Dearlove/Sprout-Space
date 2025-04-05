@@ -20,17 +20,14 @@ function MainPage() {
 
   const handleLoginSuccess = () => {
     setIsLoggedIn(true);
-    console.log(isLoggedIn)
+    console.log(isLoggedIn);
   };
-
-
 
   return (
     <main className="main-container">
       <div className="top-image">
         <img src={heading} alt="Woman Gardening" className="heading" />
       </div>
-
       <div className="content-container">
         <div className="left-side">
           <div className="text-container">
