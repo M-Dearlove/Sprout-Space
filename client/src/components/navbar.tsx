@@ -28,7 +28,7 @@ export default function NavBar() {
 
     useEffect(() => {
         // Check for token in localStorage
-        const token = localStorage.getItem('id_token');
+        const token = localStorage.getItem('token');
 
         // Update navigation items based on authentication
         if (token) {
