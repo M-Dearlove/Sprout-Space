@@ -65,7 +65,7 @@ const ResetPassword: React.FC<ResetPasswordProps> = ({ onCancel, onSuccess }) =>
         />
       </div>
       <div className="button-group">
-        <button type="submit" className="btn btn-gray" disabled={loading}>
+        <button type="submit" className="submitbtn btn-gray" disabled={loading}>
           {loading ? "Resetting..." : "Reset Password"}
         </button>
         <button type="button" className="btn btn-secondary" onClick={handleCancel}>

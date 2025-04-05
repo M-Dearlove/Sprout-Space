@@ -24,11 +24,13 @@ app.use(express.static('../client/dist'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.use('/graphql', expressMiddleware(server as any,
-  {
-    context: authenticateToken as any
+app.use('/graphql', expressMiddleware(server, {
+  context: async ({ req }) => {
+    const authContext = authenticateToken({ req });
+    console.log("Auth Context:", authContext); // Debugging step
+    return authContext;
   }
-));
+}));
 
 
 

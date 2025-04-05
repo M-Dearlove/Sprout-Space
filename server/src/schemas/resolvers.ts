@@ -31,8 +31,9 @@ const resolvers = {
   Query: {
     // Get authenticated user information
     me: async (_parent: any, _args: any, context: GraphQLContext) => {
-      if (context.user) {
-        return User.findById(context.user._id);
+      console.log("Resolver Context Object:", context)
+      if (context && context.user) {
+        return await User.findById(context.user._id);
       }
       throw new AuthenticationError('Could not authenticate user.');
     },
