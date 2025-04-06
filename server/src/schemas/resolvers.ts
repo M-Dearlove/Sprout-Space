@@ -9,9 +9,9 @@ import {
  } from '../interfaces/user-interfaces.js'
  import {
   SaveGardenArgs,
-  GardenPlannerDocument,
+  GardenPlanDocument,
   PlantPlacementDocument,
-  gardenPlannerSchema,
+  gardenPlanSchema,
   plantPlacementSchema
 } from '../interfaces/garden-interfaces.js'
 
@@ -81,11 +81,11 @@ const resolvers = {
       const { user } = context;
     
       // Setup models if they don't exist yet
-      const GardenPlan = mongoose.models.GardenPlanner || 
-        mongoose.model<GardenPlannerDocument>('GardenPlanner', gardenPlannerSchema);
+      const GardenPlan = mongoose.models.GardenPlan || 
+        mongoose.model<GardenPlanDocument>('garden-plan', gardenPlanSchema);
     
       const PlantPlacement = mongoose.models.PlantPlacement || 
-        mongoose.model<PlantPlacementDocument>('PlantPlacement', plantPlacementSchema);
+        mongoose.model<PlantPlacementDocument>('plant-placement', plantPlacementSchema);
 
       try {
         // Validate input

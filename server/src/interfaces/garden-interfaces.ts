@@ -42,7 +42,7 @@ const plantPlacementSchema = new Schema<PlantPlacementDocument>({
 });
 
 // Define interface for Garden Planner specific fields
-export interface GardenPlannerDocument extends Document {
+export interface GardenPlanDocument extends Document {
   name: string;
   rows: number;
   cols: number;
@@ -51,7 +51,7 @@ export interface GardenPlannerDocument extends Document {
 }
 
 // Define the schema for the GardenPlanner document
-const gardenPlannerSchema = new Schema<GardenPlannerDocument>({
+const gardenPlanSchema = new Schema<GardenPlanDocument>({
   name: {
     type: String,
     required: true,
@@ -90,5 +90,5 @@ export {
   PlantPlacementInput,
   SaveGardenArgs,
   plantPlacementSchema,
-  gardenPlannerSchema
+  gardenPlanSchema
 };
