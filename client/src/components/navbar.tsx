@@ -7,7 +7,6 @@ import '../styles/navbar.css';
 const allNavigation = [
     { name: 'Home', href: '/', current: true },
     { name: 'Garden Planner', href: '/garden-planner', current: false },
-    { name: 'Pest Control', href: '/pest-control', current: false },
     { name: 'Profile', href: '/profile', current: false },
     { name: 'Logout', href: '/logout', current: false },
 ];
@@ -29,7 +28,7 @@ export default function NavBar() {
 
     useEffect(() => {
         // Check for token in localStorage
-        const token = localStorage.getItem('id_token');
+        const token = localStorage.getItem('token');
 
         // Update navigation items based on authentication
         if (token) {
@@ -90,13 +89,15 @@ export default function NavBar() {
                                     <div className="nav-links">
                                         {navigation.map((item) => (
                                             item.name === 'Logout' ? (
-                                                <button
-                                                    key={item.name}
-                                                    onClick={handleLogout}
-                                                    className="nav-link-a"
-                                                >
-                                                    {item.name}
-                                                </button>
+                                                isLoggedIn && (
+                                                    <button
+                                                        key={item.name}
+                                                        onClick={handleLogout}
+                                                        className="nav-link-a"
+                                                    >
+                                                        {item.name}
+                                                    </button>
+                                                )
                                             ) : (
                                                 <Link
                                                     key={item.name}
@@ -123,12 +124,14 @@ export default function NavBar() {
                                 <div key={item.name}>
                                     <DisclosureButton as="div">
                                         {item.name === 'Logout' ? (
-                                            <button
-                                                onClick={handleLogout}
-                                                className="mobile-nav-link"
-                                            >
-                                                {item.name}
-                                            </button>
+                                            isLoggedIn && (
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="mobile-nav-link"
+                                                >
+                                                    {item.name}
+                                                </button>
+                                            )
                                         ) : (
                                             <Link
                                                 to={item.href}
@@ -143,14 +146,6 @@ export default function NavBar() {
                                     </DisclosureButton>
                                 </div>
                             ))}
-
-                            {!isLoggedIn && (
-                                <div className="signup-button-container">
-                                    <button type="button" className="signup-button">
-                                        Sign Up
-                                    </button>
-                                </div>
-                            )}
                         </div>
                     </DisclosurePanel>
                 </>
