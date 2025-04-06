@@ -15,6 +15,7 @@ const typeDefs = `
 
   type Query {
     me: User
+    getPlantCareInfo(plantName: String!): String
   }
 
   type Mutation {

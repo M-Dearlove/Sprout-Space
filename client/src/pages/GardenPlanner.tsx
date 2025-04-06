@@ -1,7 +1,10 @@
+import PlantCarePanel from '../components/PlantCarePanel';
 import React, { useState, useEffect } from 'react';
 import '../styles/Gardenplanner.css';
 import axios from 'axios';
 import defaultPlantTypes, { Plant } from '../utils/plantData';
+
+
 
 // Define interfaces
 interface LocalPlant {
@@ -277,265 +280,321 @@ const GardenPlanner: React.FC = () => {
   return (
     <div className="garden-planner">
       <h1>Square Foot Garden Planner</h1>
-      <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
+      <p className="intro-text">
+        Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.
+      </p>
+  
+      {/* --- TWO-COLUMN FLEX LAYOUT START --- */}
       <div className="garden-layout">
-        <div className="garden-controls">
-          {/* Search Bar and Plot Size Selector */}
-          <div className="controls-row">
-            <div className="search-container">
-              <form onSubmit={handleSearchSubmit} className="search-form">
-                <input
-                  type="text"
-                  placeholder="Search plants..."
-                  className="search-input"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                />
-                <button 
-                  type="submit" 
-                  className="search-button"
-                  disabled={isSearching}
-                >
-                  {isSearching ? "..." : "Search"}
-                </button>
-              </form>
-              
-              {/* API Key Notice */}
-              {!PERENUAL_API_KEY && (
-                <div className="search-error">
-                  API key not found. Check your .env file.
-                </div>
-              )}
-              
-              {/* Search Results */}
-              {searchResults.length > 0 && (
-                <div className="search-results">
-                  <h4>Search Results:</h4>
-                  {searchResults.map(plant => (
-                    <div 
-                      key={plant.id}
-                      className="search-result-item"
-                      onClick={() => addPlantToPalette({ ...plant, image: plant.image || '' })}
-                    >
-                      <div className="result-image-container">
-                        <img 
-                          src={plant.image} 
-                          alt={plant.name}
-                          className="result-image"
-                        />
-                      </div>
-                      <div className="result-details">
-                        <div className="result-name">{plant.name}</div>
-                        <div className="result-info">
-                          Plants per sq ft: {plant.plantsPerSquareFoot}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              
-              {searchError && (
-                <div className="search-error">{searchError}</div>
-              )}
-            </div>
-            
-            <div className="plot-size-selector">
-              <label htmlFor="plotSize">Plot Size:</label>
-              <select 
-                id="plotSize" 
-                value={selectedPlotSize.id}
-                onChange={(e) => handlePlotSizeChange(e.target.value)}
-                className="plot-size-select"
-              >
-                {plotSizes.map(size => (
-                  <option key={size.id} value={size.id}>
-                    {size.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <button
-              className="clear-button"
-              onClick={handleClearGarden}
-            >
-              Clear Garden
-            </button>
-            <button
-              className="print-button"
-              onClick={handlePrintGarden}
-            >
-              Print Garden Plan
-            </button>
-          </div>
-          
-          {/* Selected Plant Info */}
-          {selectedPlant && (
-            <div className="selected-plant-info">
-              <div className="selected-plant-header">
-                <div className="selected-plant-image">
-                  <img src={selectedPlant.image} alt={selectedPlant.name} />
-                </div>
-                <h3>Selected: {selectedPlant.name}</h3>
-              </div>
-              <div className="plant-quick-info">
-                <span>Spacing: {selectedPlant.spacing} inches</span> | 
-                <span>Plants per square foot: {selectedPlant.plantsPerSquareFoot}</span> | 
-                <span>Sunlight: {selectedPlant.sunlight}</span> | 
-                <span>Water: {selectedPlant.water}</span>
-              </div>
-            </div>
-          )}
+        {/* LEFT COLUMN: PLANT CARE INFO */}
+        <div className="plant-care-wrapper">
+          <PlantCarePanel plantName={selectedPlant?.name || ''} />
         </div>
-        
-        {/* Garden Grid (main content) */}
-        <div className="garden-area">
-          <div className="garden-title-print">
-            <h3>Square Foot Garden Plan</h3>
-            <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet</p>
-          </div>
-          <div className="garden-grid-container">
-            <div 
-              className="garden-grid" 
-              data-cols={selectedPlotSize.cols}
-            >
-              {garden.map((row, rowIndex) => (
-                row.map((cell, colIndex) => (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className="grid-cell"
-                    onClick={() => handleCellClick(rowIndex, colIndex)}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      handleRemovePlant(rowIndex, colIndex);
-                    }}
+  
+        {/* RIGHT COLUMN: ALL MAIN CONTENT */}
+        <div className="planner-main">
+          {/* Controls */}
+          <div className="garden-controls">
+            <div className="controls-row">
+              <div className="search-container">
+                <form onSubmit={handleSearchSubmit} className="search-form">
+                  <input
+                    type="text"
+                    placeholder="Search plants..."
+                    className="search-input"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                  />
+                  <button
+                    type="submit"
+                    className="search-button"
+                    disabled={isSearching}
                   >
-                    {cell && (
+                    {isSearching ? "..." : "Search"}
+                  </button>
+                </form>
+  
+                {!PERENUAL_API_KEY && (
+                  <div className="search-error">
+                    API key not found. Check your .env file.
+                  </div>
+                )}
+  
+                {searchResults.length > 0 && (
+                  <div className="search-results">
+                    <h4>Search Results:</h4>
+                    {searchResults.map((plant) => (
                       <div
-                        className="plant-in-grid"
-                        style={{ 
-                          width: '100%',
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          position: 'relative',
-                          textAlign: 'center'
-                        }}
+                        key={plant.id}
+                        className="search-result-item"
+                        onClick={() =>
+                          addPlantToPalette({
+                            ...plant,
+                            image: plant.image || '',
+                          })
+                        }
                       >
-                        <div className="plant-image-container" style={{ position: 'relative' }}>
-                          <img 
-                            src={cell.image} 
-                            alt={cell.name}
-                            style={{ width: '40px', height: '40px', objectFit: 'contain' }}
+                        <div className="result-image-container">
+                          <img
+                            src={plant.image}
+                            alt={plant.name}
+                            className="result-image"
                           />
-                          <div style={{ 
-                            position: 'absolute', 
-                            top: '-5px', 
-                            right: '-5px', 
-                            backgroundColor: 'black',
-                            color: 'white',
-                            width: '20px',
-                            height: '20px',
-                            borderRadius: '50%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: '12px',
-                            fontWeight: 'bold'
-                          }}>
-                            {cell.plantsPerSquareFoot}
+                        </div>
+                        <div className="result-details">
+                          <div className="result-name">{plant.name}</div>
+                          <div className="result-info">
+                            Plants per sq ft: {plant.plantsPerSquareFoot}
                           </div>
                         </div>
-                        <div style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '4px' }}>
-                          {cell.name}
-                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
-                ))
-              ))}
+                )}
+  
+                {searchError && (
+                  <div className="search-error">{searchError}</div>
+                )}
+              </div>
+  
+              <div className="plot-size-selector">
+                <label htmlFor="plotSize">Plot Size:</label>
+                <select
+                  id="plotSize"
+                  value={selectedPlotSize.id}
+                  onChange={(e) => handlePlotSizeChange(e.target.value)}
+                  className="plot-size-select"
+                >
+                  {plotSizes.map((size) => (
+                    <option key={size.id} value={size.id}>
+                      {size.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+  
+              <button className="clear-button" onClick={handleClearGarden}>
+                Clear Garden
+              </button>
+              <button className="print-button" onClick={handlePrintGarden}>
+                Print Garden Plan
+              </button>
             </div>
-          </div>
-          
-          <div className="grid-info">
-            <p>Left click to place a plant. Right click to remove.</p>
-            <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet (Each square = 1 sq ft)</p>
-          </div>
-        </div>
-        
-        {/* Plant Selection (bottom) */}
-        <div className="plant-selection-bottom">
-          <div className="plant-items" style={{ 
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: '10px'
-          }}>
-            {filteredPlants.map((plant) => (
-              <div
-                key={plant.id}
-                className={`plant-item ${selectedPlant?.id === plant.id ? 'plant-item-selected' : ''}`}
-                style={{ 
-                  backgroundColor: 'white', 
-                  border: selectedPlant?.id === plant.id ? '2px solid #4CAF50' : '1px solid #ddd',
-                  borderRadius: '4px',
-                  padding: '5px',
-                  width: '80px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  cursor: 'pointer'
-                }}
-                onClick={() => handlePlantSelect({ ...plant, image: plant.image || '' })}
-              >
-                <img 
-                  src={plant.image} 
-                  alt={plant.name}
-                  style={{ width: '30px', height: '30px', marginBottom: '4px' }}
-                />
-                <span style={{ fontSize: '12px', textAlign: 'center' }}>{plant.name}</span>
-                <div className="plant-per-foot" style={{ 
-                  fontSize: '10px', 
-                  color: '#666',
-                  backgroundColor: '#f0f0f0',
-                  padding: '2px 5px',
-                  borderRadius: '10px',
-                  marginTop: '2px'
-                }}>
-                  {plant.plantsPerSquareFoot} per sq ft
+  
+            {/* Selected Plant Info */}
+            {selectedPlant && (
+              <div className="selected-plant-info">
+                <div className="selected-plant-header">
+                  <div className="selected-plant-image">
+                    <img src={selectedPlant.image} alt={selectedPlant.name} />
+                  </div>
+                  <h3>Selected: {selectedPlant.name}</h3>
+                </div>
+                <div className="plant-quick-info">
+                  <span>Spacing: {selectedPlant.spacing} inches</span> |{' '}
+                  <span>
+                    Plants per square foot: {selectedPlant.plantsPerSquareFoot}
+                  </span>{' '}
+                  | <span>Sunlight: {selectedPlant.sunlight}</span> |{' '}
+                  <span>Water: {selectedPlant.water}</span>
                 </div>
               </div>
-            ))}
+            )}
           </div>
-          
-          <div className="legend">
-            <h3>Legend</h3>
-            <div className="legend-items" style={{ 
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px'
-            }}>
-              {/* Only show used plants in the legend */}
-              {Array.from(new Set(garden.flat().filter(Boolean).map(plant => plant?.id)))
-                .map(id => {
-                  const plant = plantTypes.find(p => p.id === id);
+  
+          {/* Garden Grid */}
+          <div className="garden-area">
+            <div className="garden-title-print">
+              <h3>Square Foot Garden Plan</h3>
+              <p>
+                Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet
+              </p>
+            </div>
+            <div className="garden-grid-container">
+              <div
+                className="garden-grid"
+                data-cols={selectedPlotSize.cols}
+              >
+                {garden.map((row, rowIndex) =>
+                  row.map((cell, colIndex) => (
+                    <div
+                      key={`${rowIndex}-${colIndex}`}
+                      className="grid-cell"
+                      onClick={() => handleCellClick(rowIndex, colIndex)}
+                      onContextMenu={(e) => {
+                        e.preventDefault();
+                        handleRemovePlant(rowIndex, colIndex);
+                      }}
+                    >
+                      {cell && (
+                        <div
+                          className="plant-in-grid"
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            position: 'relative',
+                            textAlign: 'center',
+                          }}
+                        >
+                          <div
+                            className="plant-image-container"
+                            style={{ position: 'relative' }}
+                          >
+                            <img
+                              src={cell.image}
+                              alt={cell.name}
+                              style={{
+                                width: '40px',
+                                height: '40px',
+                                objectFit: 'contain',
+                              }}
+                            />
+                            <div
+                              style={{
+                                position: 'absolute',
+                                top: '-5px',
+                                right: '-5px',
+                                backgroundColor: 'black',
+                                color: 'white',
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '50%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                              }}
+                            >
+                              {cell.plantsPerSquareFoot}
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '11px',
+                              fontWeight: 'bold',
+                              marginTop: '4px',
+                            }}
+                          >
+                            {cell.name}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+  
+            <div className="grid-info">
+              <p>Left click to place a plant. Right click to remove.</p>
+              <p>
+                Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet
+                (Each square = 1 sq ft)
+              </p>
+            </div>
+          </div>
+  
+          {/* Plant Palette */}
+          <div className="plant-selection-bottom">
+            <div
+              className="plant-items"
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}
+            >
+              {filteredPlants.map((plant) => (
+                <div
+                  key={plant.id}
+                  className={`plant-item ${
+                    selectedPlant?.id === plant.id
+                      ? 'plant-item-selected'
+                      : ''
+                  }`}
+                  style={{
+                    backgroundColor: 'white',
+                    border:
+                      selectedPlant?.id === plant.id
+                        ? '2px solid #4CAF50'
+                        : '1px solid #ddd',
+                    borderRadius: '4px',
+                    padding: '5px',
+                    width: '80px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                  }}
+                  onClick={() =>
+                    handlePlantSelect({ ...plant, image: plant.image || '' })
+                  }
+                >
+                  <img
+                    src={plant.image}
+                    alt={plant.name}
+                    style={{
+                      width: '30px',
+                      height: '30px',
+                      marginBottom: '4px',
+                    }}
+                  />
+                  <span style={{ fontSize: '12px', textAlign: 'center' }}>
+                    {plant.name}
+                  </span>
+                  <div
+                    className="plant-per-foot"
+                    style={{
+                      fontSize: '10px',
+                      color: '#666',
+                      backgroundColor: '#f0f0f0',
+                      padding: '2px 5px',
+                      borderRadius: '10px',
+                      marginTop: '2px',
+                    }}
+                  >
+                    {plant.plantsPerSquareFoot} per sq ft
+                  </div>
+                </div>
+              ))}
+            </div>
+  
+            <div className="legend">
+              <h3>Legend</h3>
+              <div
+                className="legend-items"
+                style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}
+              >
+                {Array.from(
+                  new Set(
+                    garden.flat().filter(Boolean).map((plant) => plant?.id)
+                  )
+                ).map((id) => {
+                  const plant = plantTypes.find((p) => p.id === id);
                   if (!plant) return null;
-                  
+  
                   return (
-                    <div key={plant.id} className="legend-item" style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '5px',
-                      backgroundColor: 'white',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
-                    }}>
-                      <img 
-                        src={plant.image} 
+                    <div
+                      key={plant.id}
+                      className="legend-item"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '5px',
+                        backgroundColor: 'white',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                      }}
+                    >
+                      <img
+                        src={plant.image}
                         alt={plant.name}
-                        style={{ width: '25px', height: '25px', marginRight: '8px' }}
+                        style={{
+                          width: '25px',
+                          height: '25px',
+                          marginRight: '8px',
+                        }}
                       />
                       <div>
                         <div style={{ fontWeight: 'bold' }}>{plant.name}</div>
@@ -546,36 +605,37 @@ const GardenPlanner: React.FC = () => {
                     </div>
                   );
                 })}
+              </div>
             </div>
           </div>
         </div>
       </div>
+      {/* --- TWO-COLUMN FLEX LAYOUT END --- */}
+  
+      {/* Print styles (unchanged) */}
       <style>
         {`
-        @media print {
-          .garden-controls, .search-container, .plant-selection-bottom, .clear-button, .print-button {
-            display: none !important;
+          @media print {
+            .garden-controls, .search-container, .plant-selection-bottom, .clear-button, .print-button {
+              display: none !important;
+            }
+            .garden-title-print {
+              display: block !important;
+              text-align: center;
+              margin-bottom: 20px;
+            }
+            .grid-info {
+              margin-top: 20px;
+            }
+            @page {
+              size: landscape;
+              margin: 1cm;
+            }
           }
-          
-          .garden-title-print {
-            display: block !important;
-            text-align: center;
-            margin-bottom: 20px;
-          }
-          
-          .grid-info {
-            margin-top: 20px;
-          }
-          
-          @page {
-            size: landscape;
-            margin: 1cm;
-          }
-        }
         `}
       </style>
     </div>
-  );
+  );    
 };
 
 export default GardenPlanner;

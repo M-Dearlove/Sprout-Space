@@ -1,12 +1,13 @@
 import { User } from '../models/index.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
+import { getPlantCareParagraph } from '../utils/openai.js';
 
 // Define types for the arguments
 interface RegisterUserArgs {
-    firstname: string;
-    lastname: string;
-    email: string;
-    password: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  password: string;
 }
 
 interface LoginUserArgs {
@@ -31,11 +32,16 @@ const resolvers = {
   Query: {
     // Get authenticated user information
     me: async (_parent: any, _args: any, context: GraphQLContext) => {
-      console.log("Resolver Context Object:", context)
+      console.log("Resolver Context Object:", context);
       if (context && context.user) {
         return await User.findById(context.user._id);
       }
       throw new AuthenticationError('Could not authenticate user.');
+    },
+
+    // Get plant care paragraph
+    getPlantCareInfo: async (_parent: any, args: { plantName: string }) => {
+      return await getPlantCareParagraph(args.plantName);
     },
   },
 
@@ -43,15 +49,15 @@ const resolvers = {
     // Register a new user
     register: async (_parent: any, { firstname, lastname, email, password }: RegisterUserArgs) => {
       const existingUser = await User.findOne({ email });
-      console.log('Existing User:', existingUser)
+      console.log('Existing User:', existingUser);
       if (existingUser) {
         throw new Error('User already exists.');
       }
 
       const user = await User.create({ firstname, lastname, email, password });
-      console.log('User created', user)
-      const token = signToken( user.email, user._id);
-      console.log('token', token)
+      console.log('User created', user);
+      const token = signToken(user.email, user._id);
+      console.log('token', token);
 
       return { token, user };
     },
@@ -80,9 +86,7 @@ const resolvers = {
 
       return true;
     },
-   
   },
 };
-
 
 export default resolvers;
