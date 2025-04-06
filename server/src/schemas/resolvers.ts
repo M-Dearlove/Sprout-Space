@@ -1,6 +1,7 @@
 import { User } from '../models/index.js';
+import GardenPlan from '../models/GardenPlan.js';
+import PlantPlacement from '../models/PlantPlacement.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
-import mongoose from 'mongoose';
 import {
   RegisterUserArgs,
   LoginUserArgs,
@@ -9,10 +10,6 @@ import {
  } from '../interfaces/user-interfaces.js'
  import {
   SaveGardenArgs,
-  GardenPlanDocument,
-  PlantPlacementDocument,
-  gardenPlanSchema,
-  plantPlacementSchema
 } from '../interfaces/garden-interfaces.js'
 
 
@@ -80,24 +77,17 @@ const resolvers = {
     
       const { user } = context;
     
-      // Setup models if they don't exist yet
-      const GardenPlan = mongoose.models.GardenPlan || 
-        mongoose.model<GardenPlanDocument>('garden-plan', gardenPlanSchema);
-    
-      const PlantPlacement = mongoose.models.PlantPlacement || 
-        mongoose.model<PlantPlacementDocument>('plant-placement', plantPlacementSchema);
-
       try {
         // Validate input
         if (rows <= 0 || cols <= 0) {
           throw new Error('Garden dimensions must be positive numbers');
         }
-
+    
         if (!name || name.trim() === '') {
           throw new Error('Garden name cannot be empty');
         }
-
-        const userId =  user._id;
+    
+        const userId = user._id;
       
         // Check if this is an update or a new garden
         let garden = await GardenPlan.findOne({ name, userId });
@@ -120,7 +110,7 @@ const resolvers = {
             userId
           });
         }
-
+    
         // Add all plant placements
         if (plants && plants.length > 0) {
           await PlantPlacement.insertMany(
@@ -130,7 +120,7 @@ const resolvers = {
             }))
           );
         }
-
+    
         return garden;
       } catch (error: any) {
         console.error('Error saving garden:', error);
