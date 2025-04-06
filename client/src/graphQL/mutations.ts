@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+
 // LOGIN MUTATION
 export const LOGIN_USER = gql`
   mutation login($email: String!, $password: String!) {
@@ -25,8 +26,21 @@ export const REGISTER_USER = gql`
   }
 `;
 
+//RESET PASSWORD MUTATION
 export const RESET_PASSWORD = gql`
   mutation resetPassword($email: String!, $newPassword: String!) {
     resetPassword(email: $email, newPassword: $newPassword)
+  }
+`;
+
+//Garden Planner mutations
+export const SAVE_GARDEN_MUTATION = gql`
+  mutation SaveGarden($name: String!, $rows: Int!, $cols: Int!, $plants: [PlantPlacementInput!]!) {
+    saveGarden(name: $name, rows: $rows, cols: $cols, plants: $plants) {
+      id
+      name
+      rows
+      cols
+    }
   }
 `;

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Gardenplanner.css';
 import defaultPlantTypes, { Plant } from '../utils/plantData';
-import { useQuery, useMutation, gql } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
+import {SAVE_GARDEN_MUTATION } from '../graphQL/mutations';
+import { SEARCH_PLANTS_QUERY } from '../graphQL/queries';
+
 import '../styles/Gardensave.css'
 
 // Define interfaces
@@ -25,33 +28,7 @@ interface PlotSize {
   cols: number;
 }
 
-// GraphQL queries and mutations
-const SEARCH_PLANTS_QUERY = gql`
-  query SearchPlants($searchTerm: String!, $limit: Int) {
-    searchPlants(searchTerm: $searchTerm, limit: $limit) {
-      id
-      commonName
-      scientificName
-      cycle
-      watering
-      sunlight
-      defaultImage {
-        thumbnail
-      }
-    }
-  }
-`;
 
-const SAVE_GARDEN_MUTATION = gql`
-  mutation SaveGarden($name: String!, $rows: Int!, $cols: Int!, $plants: [PlantPlacementInput!]!) {
-    saveGarden(name: $name, rows: $rows, cols: $cols, plants: $plants) {
-      id
-      name
-      rows
-      cols
-    }
-  }
-`;
 
 // Calculate plants per square foot based on spacing
 const calculatePlantsPerSquareFoot = (spacing: number): number => {
