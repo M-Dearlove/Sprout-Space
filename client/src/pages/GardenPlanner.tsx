@@ -288,6 +288,7 @@ const GardenPlanner: React.FC = () => {
       )}
       
       <div className="garden-layout">
+      <PlantCarePanel plantName={selectedPlant?.name || ''} />
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
           <div className="controls-row">
