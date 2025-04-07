@@ -1,16 +1,50 @@
 import PlantCarePanel from '../components/PlantCarePanel';
 import React, { useState, useEffect } from 'react';
 import '../styles/Gardenplanner.css';
-import defaultPlantTypes, { Plant } from '../utils/plantData';
+//import defaultPlantTypes, { Plant } from '../utils/plantData';
 import { useQuery, useMutation } from '@apollo/client';
-import {SAVE_GARDEN_MUTATION } from '../graphQL/mutations';
-import { SEARCH_PLANTS_QUERY } from '../graphQL/queries';
+import { SAVE_GARDEN_MUTATION } from '../graphQL/mutations';
+import { SEARCH_PLANTS_QUERY, GET_GARDEN_BY_ID, GET_ALL_PLANTS } from '../graphQL/queries';
+import { useLocation } from 'react-router-dom';
+
 
 import '../styles/Gardensave.css'
 import GardenToolkit from '../components/gardentoolkit';
 
-// Define interfaces
-interface LocalPlant {
+//Define interfaces
+// interface LocalPlant {
+//   id: string;
+//   name: string;
+//   color: string;
+//   width: number;
+//   height: number;
+//   spacing: number;
+//   sunlight: string;
+//   water: string;
+//   plantsPerSquareFoot: number;
+//   image?: string;
+// }
+interface DBPlant {
+  _id: string;
+  plantName: string;
+  plantType: string;
+  plantDescription: string;
+  plantImage: string;
+  plantWatering: string;
+  plantLight: string;
+  plantSoil: string;
+  plantFertilizer: string;
+  plantHumidity: string;
+  plantTemperature: string;
+  plantToxicity: string;
+  plantPests: string;
+  plantDiseases: string;
+  spacing: number;
+  plantsPerSquareFoot: number;
+  color: string;
+}
+
+interface Plant {
   id: string;
   name: string;
   color: string;
@@ -31,15 +65,32 @@ interface PlotSize {
 }
 
 
-
 // Calculate plants per square foot based on spacing
 const calculatePlantsPerSquareFoot = (spacing: number): number => {
-  if (spacing >= 18) return 0.5; // 1 plant per 2 squares
+  if (spacing >= 18) return 0.25; // 1 plant per 4 squares
   if (spacing >= 12) return 1;
   if (spacing >= 6) return 4;
   if (spacing >= 4) return 9;
   return 16; // 3 inches or less spacing
 };
+
+// Convert database plant to local plant format
+const convertDbPlantToLocalPlant = (dbPlant: DBPlant): Plant => {
+  return {
+    id: dbPlant._id,
+    name: dbPlant.plantName,
+    color: dbPlant.color,
+    width: 1,
+    height: 1,
+    spacing: dbPlant.spacing,
+    sunlight: dbPlant.plantLight,
+    water: dbPlant.plantWatering,
+    plantsPerSquareFoot: dbPlant.plantsPerSquareFoot,
+    image: dbPlant.plantImage
+  };
+};
+
+
 
 const GardenPlanner: React.FC = () => {
   // Available plot sizes
@@ -56,10 +107,10 @@ const GardenPlanner: React.FC = () => {
   // State
   const [selectedPlotSize, setSelectedPlotSize] = useState<PlotSize>(plotSizes[1]); // Default to xxs
   const [garden, setGarden] = useState<(Plant | null)[][]>([]);
-  const [selectedPlant, setSelectedPlant] = useState<LocalPlant | null>(null);
+  const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [plantTypes, setPlantTypes] = useState<LocalPlant[]>(defaultPlantTypes);
-  const [searchResults, setSearchResults] = useState<LocalPlant[]>([]);
+  const [plantTypes, setPlantTypes] = useState<Plant[]>([]);
+  const [searchResults, setSearchResults] = useState<Plant[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [executeSearch, setExecuteSearch] = useState(false);
@@ -67,13 +118,37 @@ const GardenPlanner: React.FC = () => {
   const [saveSuccess, setSaveSuccess] = useState('');
   const [saveError, setSaveError] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const [isLoadingGarden, setIsLoadingGarden] = useState(false);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const gardenId = queryParams.get('gardenId');
+
+// Query to get all plants from the database
+// note - do not need data parameter from query at this time
+  const { loading: plantsLoading, error: plantsError } = useQuery(GET_ALL_PLANTS, {
+  onCompleted: (data) => {
+    // Convert database plants to local plant format
+    if (data && data.plants) {
+      const convertedPlants = data.plants.map(convertDbPlantToLocalPlant);
+      setPlantTypes(convertedPlants);
+    }
+  },
+  onError: (error) => {
+    console.error('Error loading plants:', error);
+  }
+});
+
+
 
   // Initialize garden grid when plot size changes
   useEffect(() => {
-    setGarden(
-      Array(selectedPlotSize.rows).fill(null).map(() => Array(selectedPlotSize.cols).fill(null))
-    );
-  }, [selectedPlotSize]);
+    // Only initialize an empty grid if we're not currently loading a garden
+    if (!isLoadingGarden) {
+      setGarden(
+        Array(selectedPlotSize.rows).fill(null).map(() => Array(selectedPlotSize.cols).fill(null))
+      );
+    }
+  }, [selectedPlotSize, isLoadingGarden]);
 
   // GraphQL query for searching plants
   const { error, refetch } = useQuery(SEARCH_PLANTS_QUERY, {
@@ -82,18 +157,18 @@ const GardenPlanner: React.FC = () => {
     onCompleted: (data) => {
       setExecuteSearch(false);
       setIsSearching(false);
-      
+
       if (data && data.searchPlants && data.searchPlants.length > 0) {
         // Convert GraphQL plants to our plant format
-        const graphqlPlants: LocalPlant[] = data.searchPlants.map((plant: any) => {
+        const graphqlPlants: Plant[] = data.searchPlants.map((plant: any) => {
           // Generate a color based on plant id
           const colors = ['#ff6b6b', '#ff9f43', '#1dd1a1', '#10ac84', '#2e86de', '#f9ca24', '#6ab04c', '#eb4d4b'];
           const plantId = parseInt(plant.id);
           const color = colors[plantId % colors.length];
-          
+
           // Default spacing (can be adjusted)
           const spacing = 12;
-         
+
           return {
             id: `gql-${plant.id}`,
             name: plant.commonName,
@@ -102,14 +177,14 @@ const GardenPlanner: React.FC = () => {
             height: 1,
             spacing: spacing,
             plantsPerSquareFoot: calculatePlantsPerSquareFoot(spacing),
-            sunlight: Array.isArray(plant.sunlight) && plant.sunlight.length > 0 
-              ? plant.sunlight.join(', ') 
+            sunlight: Array.isArray(plant.sunlight) && plant.sunlight.length > 0
+              ? plant.sunlight.join(', ')
               : 'Unknown',
             water: plant.watering || 'Unknown',
             image: plant.defaultImage?.thumbnail || 'https://cdn-icons-png.flaticon.com/128/628/628324.png'
           };
         });
-        
+
         setSearchResults(graphqlPlants);
       } else {
         setSearchError('No plants found matching your search.');
@@ -118,12 +193,72 @@ const GardenPlanner: React.FC = () => {
     }
   });
 
+  useQuery(
+    GET_GARDEN_BY_ID,
+    {
+      variables: { id: gardenId },
+      skip: !gardenId,
+      onCompleted: (data) => {
+        if (data && data.garden) {
+          setIsLoadingGarden(true);
+
+          // Set garden name
+          setGardenName(data.garden.name);
+
+          // Set plot size
+          const plotSize = plotSizes.find(
+            size => size.rows === data.garden.rows && size.cols === data.garden.cols
+          ) || plotSizes[1];
+          setSelectedPlotSize(plotSize);
+
+          // Create populated garden grid
+          const newGarden = Array(data.garden.rows)
+            .fill(null)
+            .map(() => Array(data.garden.cols).fill(null));
+
+          // Populate with plants
+          data.garden.plants.forEach((plant: { row: any; col: any; plantId: any; plantName: any; color: any; spacing: any; plantsPerSquareFoot: any; sunlight: any; water: any; image: any; }) => {
+            const rowIndex = Number(plant.row);
+            const colIndex = Number(plant.col);
+
+            // Make sure the indices are valid before assigning
+            if (rowIndex >= 0 && rowIndex < data.garden.rows &&
+              colIndex >= 0 && colIndex < data.garden.cols) {
+              // Ensure all required plant properties are included
+              newGarden[rowIndex][colIndex] = {
+                id: plant.plantId,
+                name: plant.plantName || "Plant",
+                color: plant.color || "#4CAF50",
+                width: 1,
+                height: 1,
+                spacing: plant.spacing || 12,
+                plantsPerSquareFoot: plant.plantsPerSquareFoot || 1,
+                sunlight: plant.sunlight || "Unknown",
+                water: plant.water || "Unknown",
+                image: plant.image || 'https://cdn-icons-png.flaticon.com/128/628/628324.png'
+              };
+            }
+          });
+
+          // Set the garden grid directly
+          setGarden(newGarden);
+
+          setIsLoadingGarden(false);
+        }
+      },
+      onError: (error) => {
+        console.error("Error loading garden:", error);
+        setIsLoadingGarden(false);
+      }
+    }
+  );
+
   // GraphQL mutation for saving gardens
   const [saveGarden, { loading: saveLoading }] = useMutation(SAVE_GARDEN_MUTATION, {
     onCompleted: (data) => {
       setSaveSuccess(`Garden "${data.saveGarden.name}" saved successfully!`);
       setShowSaveDialog(false);
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => {
         setSaveSuccess('');
@@ -146,13 +281,13 @@ const GardenPlanner: React.FC = () => {
   // Handle search input change
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
-    
+
     // If search term is empty, clear results
     if (!e.target.value.trim()) {
       setSearchResults([]);
     }
   };
-  
+
   // Handle search form submission
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,60 +295,60 @@ const GardenPlanner: React.FC = () => {
       setSearchResults([]);
       return;
     }
-    
+
     setIsSearching(true);
     setSearchError('');
     setExecuteSearch(true);
-    
+
     // Trigger the GraphQL query
     refetch({ searchTerm, limit: 8 });
   };
-  
+
   // Add a plant from search results to the palette
   const addPlantToPalette = (plant: Plant) => {
     // Check if plant is already in the palette
     if (!plantTypes.some(p => p.id === plant.id)) {
       setPlantTypes([...plantTypes, plant]);
     }
-    
+
     // Select the plant
     setSelectedPlant(plant);
-    
+
     // Clear search results
     setSearchResults([]);
     setSearchTerm('');
   };
-  
+
   // Handle selecting a plant
   const handlePlantSelect = (plant: Plant): void => {
     setSelectedPlant(plant);
   };
-  
+
   // Handle placing a plant in the garden
   const handleCellClick = (rowIndex: number, colIndex: number): void => {
     if (!selectedPlant) return;
-    
+
     // Check if space is available
     if (garden[rowIndex][colIndex]) return;
-    
+
     // Create a new garden grid with the selected plant placed
     const newGarden = [...garden];
-    newGarden[rowIndex][colIndex] = { 
-      ...selectedPlant, 
+    newGarden[rowIndex][colIndex] = {
+      ...selectedPlant,
       image: selectedPlant.image || '' // Ensure image is a string
     };
     setGarden(newGarden);
   };
-  
+
   // Handle removing a plant
   const handleRemovePlant = (rowIndex: number, colIndex: number): void => {
     if (!garden[rowIndex][colIndex]) return;
-    
+
     const newGarden = [...garden];
     newGarden[rowIndex][colIndex] = null;
     setGarden(newGarden);
   };
-  
+
   // Clear the entire garden
   const handleClearGarden = (): void => {
     setGarden(
@@ -244,19 +379,31 @@ const GardenPlanner: React.FC = () => {
   // Handle garden save
   const handleSaveGarden = (e: React.FormEvent): void => {
     e.preventDefault();
-    
+
     if (!gardenName.trim()) {
       setSaveError('Please enter a name for your garden.');
       return;
     }
-    
-    // Format plants for the mutation
-    const plants = garden.flatMap((row, rowIndex) => 
-      row.flatMap((plant, colIndex) => 
-        plant ? [{ plantId: plant.id, row: rowIndex, col: colIndex }] : []
+
+    // Format plants for the mutation, including additional details
+    const plants = garden.flatMap((row, rowIndex) =>
+      row.flatMap((plant, colIndex) =>
+        plant ? [{
+          plantId: plant.id,
+          row: rowIndex,
+          col: colIndex,
+          // Include additional plant details for databse
+          plantName: plant.name,
+          color: plant.color,
+          spacing: plant.spacing,
+          plantsPerSquareFoot: plant.plantsPerSquareFoot,
+          sunlight: plant.sunlight,
+          water: plant.water,
+          // Store image path instead of the binary image so not storing it multiple times per garden
+          image: plant.image
+        }] : []
       )
     );
-    
     // Execute the mutation
     saveGarden({
       variables: {
@@ -275,7 +422,7 @@ const GardenPlanner: React.FC = () => {
 
 
   // Filter plants based on local filtering (not GraphQL search)
-  const filteredPlants = plantTypes.filter(plant => 
+  const filteredPlants = plantTypes.filter(plant =>
     !searchTerm || plant.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -283,6 +430,7 @@ const GardenPlanner: React.FC = () => {
     <div className="garden-planner">
       <h1>Square Foot Garden Planner</h1>
       <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
+
       <PlantCarePanel plantName={selectedPlant?.name || ''} />
 
            {/* Garden Toolkit */}
@@ -291,11 +439,23 @@ const GardenPlanner: React.FC = () => {
      <div className="garden-controls"></div>
          </div>
       {/* Error Message */}
+        
+      {/* Plants loading message */}
+      {plantsLoading && (
+        <div className="loading-message">Loading plants...</div>
+      )}
+
+      {/* Error message for plants */}
+      {plantsError && (
+        <div className="error-message">Error loading plants: {plantsError.message}</div>
+      )}
+
+
       {/* Save Success Message */}
       {saveSuccess && (
         <div className="save-success">{saveSuccess}</div>
       )}
-      
+
       <div className="garden-layout">
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
@@ -309,30 +469,28 @@ const GardenPlanner: React.FC = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                 />
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="search-button"
                   disabled={isSearching}
                 >
                   {isSearching ? "..." : "Search"}
                 </button>
               </form>
-              
-          
-              
+
               {/* Search Results */}
               {searchResults.length > 0 && (
                 <div className="search-results">
                   <h4>Search Results:</h4>
                   {searchResults.map(plant => (
-                    <div 
+                    <div
                       key={plant.id}
                       className="search-result-item"
                       onClick={() => addPlantToPalette({ ...plant, image: plant.image || '' })}
                     >
                       <div className="result-image-container">
-                        <img 
-                          src={plant.image} 
+                        <img
+                          src={plant.image}
                           alt={plant.name}
                           className="result-image"
                         />
@@ -347,16 +505,16 @@ const GardenPlanner: React.FC = () => {
                   ))}
                 </div>
               )}
-              
+
               {searchError && (
                 <div className="search-error">{searchError}</div>
               )}
             </div>
-            
+
             <div className="plot-size-selector">
               <label htmlFor="plotSize">Plot Size:</label>
-              <select 
-                id="plotSize" 
+              <select
+                id="plotSize"
                 value={selectedPlotSize.id}
                 onChange={(e) => handlePlotSizeChange(e.target.value)}
                 className="plot-size-select"
@@ -368,7 +526,7 @@ const GardenPlanner: React.FC = () => {
                 ))}
               </select>
             </div>
-            
+
             {/* Garden name input */}
             <div className="garden-name-input">
               <input
@@ -379,7 +537,7 @@ const GardenPlanner: React.FC = () => {
                 className="garden-name-field"
               />
             </div>
-            
+
             {/* Save Garden Button */}
             <button
               className="save-button"
@@ -388,7 +546,7 @@ const GardenPlanner: React.FC = () => {
             >
               {saveLoading ? "Saving..." : "Save Garden"}
             </button>
-            
+
             <button
               className="clear-button"
               onClick={handleClearGarden}
@@ -402,7 +560,7 @@ const GardenPlanner: React.FC = () => {
               Print Garden Plan
             </button>
           </div>
-          
+
           {/* Selected Plant Info */}
           {selectedPlant && (
             <div className="selected-plant-info">
@@ -413,15 +571,15 @@ const GardenPlanner: React.FC = () => {
                 <h3>Selected: {selectedPlant.name}</h3>
               </div>
               <div className="plant-quick-info">
-                <span>Spacing: {selectedPlant.spacing} inches</span> | 
-                <span>Plants per square foot: {selectedPlant.plantsPerSquareFoot}</span> | 
-                <span>Sunlight: {selectedPlant.sunlight}</span> | 
+                <span>Spacing: {selectedPlant.spacing} inches</span> |
+                <span>Plants per square foot: {selectedPlant.plantsPerSquareFoot}</span> |
+                <span>Sunlight: {selectedPlant.sunlight}</span> |
                 <span>Water: {selectedPlant.water}</span>
               </div>
             </div>
           )}
         </div>
-        
+
         {/* Garden Grid (main content) */}
         <div className="garden-area">
           <div className="garden-title-print">
@@ -429,8 +587,8 @@ const GardenPlanner: React.FC = () => {
             <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet</p>
           </div>
           <div className="garden-grid-container">
-            <div 
-              className="garden-grid" 
+            <div
+              className="garden-grid"
               data-cols={selectedPlotSize.cols}
             >
               {garden.map((row, rowIndex) => (
@@ -447,7 +605,7 @@ const GardenPlanner: React.FC = () => {
                     {cell && (
                       <div
                         className="plant-in-grid"
-                        style={{ 
+                        style={{
                           width: '100%',
                           height: '100%',
                           display: 'flex',
@@ -459,15 +617,15 @@ const GardenPlanner: React.FC = () => {
                         }}
                       >
                         <div className="plant-image-container" style={{ position: 'relative' }}>
-                          <img 
-                            src={cell.image} 
+                          <img
+                            src={cell.image}
                             alt={cell.name}
                             style={{ width: '40px', height: '40px', objectFit: 'contain' }}
                           />
-                          <div style={{ 
-                            position: 'absolute', 
-                            top: '-5px', 
-                            right: '-5px', 
+                          <div style={{
+                            position: 'absolute',
+                            top: '-5px',
+                            right: '-5px',
                             backgroundColor: 'black',
                             color: 'white',
                             width: '20px',
@@ -492,16 +650,16 @@ const GardenPlanner: React.FC = () => {
               ))}
             </div>
           </div>
-          
+
           <div className="grid-info">
             <p>Left click to place a plant. Right click to remove.</p>
             <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet (Each square = 1 sq ft)</p>
           </div>
         </div>
-     
+    
         {/* Plant Selection (bottom) */}
         <div className="plant-selection-bottom">
-          <div className="plant-items" style={{ 
+          <div className="plant-items" style={{
             display: 'flex',
             flexWrap: 'wrap',
             gap: '10px'
@@ -510,8 +668,8 @@ const GardenPlanner: React.FC = () => {
               <div
                 key={plant.id}
                 className={`plant-item ${selectedPlant?.id === plant.id ? 'plant-item-selected' : ''}`}
-                style={{ 
-                  backgroundColor: 'white', 
+                style={{
+                  backgroundColor: 'white',
                   border: selectedPlant?.id === plant.id ? '2px solid #4CAF50' : '1px solid #ddd',
                   borderRadius: '4px',
                   padding: '5px',
@@ -523,14 +681,14 @@ const GardenPlanner: React.FC = () => {
                 }}
                 onClick={() => handlePlantSelect({ ...plant, image: plant.image || '' })}
               >
-                <img 
-                  src={plant.image} 
+                <img
+                  src={plant.image}
                   alt={plant.name}
                   style={{ width: '30px', height: '30px', marginBottom: '4px' }}
                 />
                 <span style={{ fontSize: '12px', textAlign: 'center' }}>{plant.name}</span>
-                <div className="plant-per-foot" style={{ 
-                  fontSize: '10px', 
+                <div className="plant-per-foot" style={{
+                  fontSize: '10px',
                   color: '#666',
                   backgroundColor: '#f0f0f0',
                   padding: '2px 5px',
@@ -542,10 +700,10 @@ const GardenPlanner: React.FC = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="legend">
             <h3>Legend</h3>
-            <div className="legend-items" style={{ 
+            <div className="legend-items" style={{
               display: 'flex',
               flexWrap: 'wrap',
               gap: '10px'
@@ -555,7 +713,7 @@ const GardenPlanner: React.FC = () => {
                 .map(id => {
                   const plant = plantTypes.find(p => p.id === id);
                   if (!plant) return null;
-  
+
                   return (
                     <div
                       key={plant.id}
@@ -588,17 +746,22 @@ const GardenPlanner: React.FC = () => {
                   );
                 })}
             </div>
+            <div className="plantcare-container">
+            <PlantCarePanel
+              plantName={selectedPlant?.name || ''}
+            />
+          </div>
           </div>
         </div>
       </div>
-      
+
       {/* Save Garden Dialog */}
       {showSaveDialog && (
         <div className="save-dialog-overlay">
           <div className="save-dialog">
             <h3>Save Your Garden</h3>
             {saveError && <div className="save-error">{saveError}</div>}
-            
+
             <form onSubmit={handleSaveGarden}>
               <div className="form-group">
                 <label htmlFor="gardenName">Garden Name:</label>
@@ -611,24 +774,24 @@ const GardenPlanner: React.FC = () => {
                   required
                 />
               </div>
-              
+
               <div className="form-group">
                 <p>
                   Size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet<br />
                   Plants: {garden.flat().filter(Boolean).length}
                 </p>
               </div>
-              
+
               <div className="dialog-buttons">
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="cancel-button"
                   onClick={() => setShowSaveDialog(false)}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="save-confirm-button"
                   disabled={saveLoading}
                 >
@@ -639,7 +802,7 @@ const GardenPlanner: React.FC = () => {
           </div>
         </div>
       )}
-      
+
       <style>
         {`
         @media print {
@@ -727,7 +890,7 @@ const GardenPlanner: React.FC = () => {
         `}
       </style>
     </div>
-  );    
+  );
 };
 
 export default GardenPlanner;

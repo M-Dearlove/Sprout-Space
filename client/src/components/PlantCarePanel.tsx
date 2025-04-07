@@ -1,5 +1,6 @@
 import { useLazyQuery, gql } from '@apollo/client';
 import { useEffect } from 'react';
+import '../styles/PlantCarePanel.css';
 
 const GET_PLANT_CARE_INFO = gql`
   query GetPlantCareInfo($plantName: String!) {
@@ -21,13 +22,13 @@ export default function PlantCarePanel({ plantName }: Props) {
   }, [plantName]);
 
   return (
-    <div className="bg-white p-4 w-80 h-full border-r border-gray-300 overflow-y-auto">
-      <h2 className="text-lg font-bold mb-2">
+    <div className="plant-care-panel">
+      <h2 className="panel-title">
         {plantName ? `How to Grow ${plantName}` : 'Select a Plant'}
       </h2>
-      {loading && <p className="text-sm italic">Loading care info...</p>}
+      {loading && <p className="loading-text">Loading care info...</p>}
       {data?.getPlantCareInfo && (
-        <p className="text-sm leading-relaxed whitespace-pre-line">
+        <p className="care-info-text">
           {data.getPlantCareInfo}
         </p>
       )}
