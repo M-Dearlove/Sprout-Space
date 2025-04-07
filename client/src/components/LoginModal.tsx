@@ -41,9 +41,7 @@ useEffect(() => {
           variables: { email, password },
         });
       } else {
-        console.log("Register credentials:");
-        console.log(email, password);
-        response = await register({
+         response = await register({
           variables: { firstname, lastname, email, password },
         });
       }

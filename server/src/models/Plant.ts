@@ -1,6 +1,8 @@
-import { Schema, type Document } from 'mongoose';
+// server/models/Plant.js
+import { Schema, model, Document } from 'mongoose';
 
-export interface PlantDocument extends Document {
+
+interface IPlant extends Document {
     plantName: string;
     plantType: string;
     plantDescription: string;
@@ -14,9 +16,13 @@ export interface PlantDocument extends Document {
     plantToxicity: string;
     plantPests: string;
     plantDiseases: string;
+    spacing: number;
+    plantsPerSquareFoot: number;
+    color: string;
 }
 
-const plantSchema = new Schema<PlantDocument>({
+const plantSchema = new Schema<IPlant>(
+{
     plantName: {
         type: String,
         required: true,
@@ -33,7 +39,6 @@ const plantSchema = new Schema<PlantDocument>({
         trim: true,
     },
     plantImage: {
-
         type: String,
         required: true,
         trim: true,
@@ -42,7 +47,6 @@ const plantSchema = new Schema<PlantDocument>({
         type: String,
         required: true,
         trim: true,
-
     },
     plantLight: {
         type: String,
@@ -50,7 +54,6 @@ const plantSchema = new Schema<PlantDocument>({
         trim: true,
     },
     plantSoil: {
-
         type: String,
         required: true,
         trim: true,
@@ -85,19 +88,23 @@ const plantSchema = new Schema<PlantDocument>({
         required: true,
         trim: true,
     },
-}, {
-    toJSON: {
-        virtuals: true,
-        getters: true,
+    // Additional fields for garden planner
+    spacing: {
+        type: Number,
+        required: true,
+        default: 12
     },
-    toObject: {
-        virtuals: true,
-        getters: true,
+    plantsPerSquareFoot: {
+        type: Number,
+        required: true,
+        default: 1
     },
-    id: false,
+    color: {
+        type: String,
+        required: true,
+        default: '#4CAF50'
+    }
 });
-// Create and export the Plant model
-import mongoose from 'mongoose';
 
-const Plant = mongoose.model<PlantDocument>('Plant', plantSchema);
+const Plant = model<IPlant>('Plant', plantSchema);
 export default Plant;
