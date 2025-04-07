@@ -1,30 +1,15 @@
-import { Schema, model, Document } from 'mongoose';
+// server/models/PlantPlacement.js
+import mongoose from 'mongoose';
+const { Schema } = mongoose;
 
-// Define an interface for the PlantPlacement document
-export interface PlantPlacementDocument extends Document {
-  plantId: string;
-  gardenId: string;
-  row: number;
-  col: number;
-  plantName: string;
-  color: string;
-  spacing: number;
-  plantsPerSquareFoot: number;
-  sunlight: string;
-  water: string;
-  image: string;
-}
-
-// Define the schema for the PlantPlacement document
-const plantPlacementSchema = new Schema<PlantPlacementDocument>({
-  plantId: {
-    type: String,
-    ref: 'Plant',
+const plantPlacementSchema = new Schema({
+  gardenId: {
+    type: Schema.Types.ObjectId,
+    ref: 'GardenPlan',
     required: true
   },
-  gardenId: {
+  plantId: {
     type: String,
-    ref: 'GardenPlan',
     required: true
   },
   row: {
@@ -37,39 +22,33 @@ const plantPlacementSchema = new Schema<PlantPlacementDocument>({
   },
   plantName: {
     type: String,
-    default: "Plant",
+    required: false
   },
   color: {
     type: String,
-    default: "#4CAF50"
+    required: false
   },
   spacing: {
     type: Number,
-    default: 12
+    required: false
   },
   plantsPerSquareFoot: {
     type: Number,
-    default: 1
+    required: false
   },
   sunlight: {
     type: String,
-    default: "Full Sun"
+    required: false
   },
   water: {
     type: String,
-    default: "Regular"
+    required: false
   },
   image: {
     type: String,
-    default: 'https://cdn-icons-png.flaticon.com/128/628/628324.png'
+    required: false
   }
-}, {
-  timestamps: true,
-  toJSON: { getters: true },
-  toObject: { getters: true }
 });
 
-// Create and export the model
-const PlantPlacement = model<PlantPlacementDocument>('PlantPlacement', plantPlacementSchema);
-
+const PlantPlacement = mongoose.model('PlantPlacement', plantPlacementSchema);
 export default PlantPlacement;
