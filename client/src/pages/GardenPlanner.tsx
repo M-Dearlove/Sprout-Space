@@ -124,20 +124,20 @@ const GardenPlanner: React.FC = () => {
   const gardenId = queryParams.get('gardenId');
   const [gardensLoaded, setGardensLoaded] = useState(false);
 
-// Query to get all plants from the database
-// note - do not need data parameter from query at this time
+  // Query to get all plants from the database
+  // note - do not need data parameter from query at this time
   const { loading: plantsLoading, error: plantsError } = useQuery(GET_ALL_PLANTS, {
-  onCompleted: (data) => {
-    // Convert database plants to local plant format
-    if (data && data.plants) {
-      const convertedPlants = data.plants.map(convertDbPlantToLocalPlant);
-      setPlantTypes(convertedPlants);
+    onCompleted: (data) => {
+      // Convert database plants to local plant format
+      if (data && data.plants) {
+        const convertedPlants = data.plants.map(convertDbPlantToLocalPlant);
+        setPlantTypes(convertedPlants);
+      }
+    },
+    onError: (error) => {
+      console.error('Error loading plants:', error);
     }
-  },
-  onError: (error) => {
-    console.error('Error loading plants:', error);
-  }
-});
+  });
 
 
 
@@ -204,38 +204,38 @@ const GardenPlanner: React.FC = () => {
         if (data && data.garden) {
           setIsLoadingGarden(true);
           console.log("Garden data loaded:", data.garden);
-  
+
           // Set garden name
           setGardenName(data.garden.name);
-  
+
           // Find the matching plot size or use default
           const plotSize = plotSizes.find(
             size => size.rows === data.garden.rows && size.cols === data.garden.cols
           ) || plotSizes[1];
-          
+
           setSelectedPlotSize(plotSize);
-  
+
           // Create new empty garden grid with the correct dimensions
           const newGarden = Array(data.garden.rows)
             .fill(null)
             .map(() => Array(data.garden.cols).fill(null));
-  
+
           // Log plants for debugging
           console.log("Plants to place:", data.garden.plants);
-  
+
           // Populate plants with explicit parsing of indices
           if (data.garden.plants && data.garden.plants.length > 0) {
             data.garden.plants.forEach((plant: any) => {
               const rowIndex = parseInt(plant.row, 10);
               const colIndex = parseInt(plant.col, 10);
-  
+
               // Validate indices
               if (
-                !isNaN(rowIndex) && 
-                !isNaN(colIndex) && 
-                rowIndex >= 0 && 
+                !isNaN(rowIndex) &&
+                !isNaN(colIndex) &&
+                rowIndex >= 0 &&
                 rowIndex < data.garden.rows &&
-                colIndex >= 0 && 
+                colIndex >= 0 &&
                 colIndex < data.garden.cols
               ) {
                 // Create plant object with all required properties
@@ -256,14 +256,14 @@ const GardenPlanner: React.FC = () => {
               }
             });
           }
-  
+
           // Set the garden grid with the populated plants
           setGarden(newGarden);
-          
+
           // Add plants from garden to plantTypes palette if not already there
           const existingPlantIds = new Set(plantTypes.map(p => p.id));
           const newPlants: Plant[] = [];
-          
+
           data.garden.plants.forEach((plant: any) => {
             if (plant.plantId && !existingPlantIds.has(plant.plantId)) {
               newPlants.push({
@@ -281,11 +281,11 @@ const GardenPlanner: React.FC = () => {
               existingPlantIds.add(plant.plantId);
             }
           });
-          
+
           if (newPlants.length > 0) {
             setPlantTypes(prevPlants => [...prevPlants, ...newPlants]);
           }
-  
+
           // Mark garden as loaded AFTER all state is updated
           setGardensLoaded(true);
           setIsLoadingGarden(false);
@@ -476,16 +476,13 @@ const GardenPlanner: React.FC = () => {
     <div className="garden-planner">
       <h1>Square Foot Garden Planner</h1>
       <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
-
-      <PlantCarePanel plantName={selectedPlant?.name || ''} />
-
-           {/* Garden Toolkit */}
-     <div className="garden-layout">
-     <GardenToolkit />
-     <div className="garden-controls"></div>
-         </div>
+      {/* Garden Toolkit */}
+      <div className="garden-layout">
+        <GardenToolkit />
+        <div className="garden-controls"></div>
+      </div>
       {/* Error Message */}
-        
+
       {/* Plants loading message */}
       {plantsLoading && (
         <div className="loading-message">Loading plants...</div>
@@ -702,7 +699,7 @@ const GardenPlanner: React.FC = () => {
             <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet (Each square = 1 sq ft)</p>
           </div>
         </div>
-    
+
         {/* Plant Selection (bottom) */}
         <div className="plant-selection-bottom">
           <div className="plant-items" style={{
@@ -793,10 +790,10 @@ const GardenPlanner: React.FC = () => {
                 })}
             </div>
             <div className="plantcare-container">
-            <PlantCarePanel
-              plantName={selectedPlant?.name || ''}
-            />
-          </div>
+              <PlantCarePanel
+                plantName={selectedPlant?.name || ''}
+              />
+            </div>
           </div>
         </div>
       </div>
