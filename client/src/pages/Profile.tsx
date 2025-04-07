@@ -1,12 +1,14 @@
 import { useQuery } from '@apollo/client';
 import { QUERY_ME, GET_USER_GARDENS } from '../graphQL/queries';
 import '../styles/Profile.css';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom'; // Add useLocation import
 import { useState, useEffect } from 'react';
 
 const ProfilePage = () => {
+  const location = useLocation(); // Add this to access location
+  
   const { loading: profileLoading, error: profileError, data: profileData } = useQuery(QUERY_ME);
-  const { loading: gardensLoading, error: gardensError, data: gardensData } = useQuery(GET_USER_GARDENS, {
+  const { loading: gardensLoading, error: gardensError, data: gardensData, refetch: refetchGardens } = useQuery(GET_USER_GARDENS, {
     onError: (error) => {
       console.error("Error fetching gardens:", error);
     }
@@ -19,6 +21,11 @@ const ProfilePage = () => {
       setGardens(gardensData.userGardens);
     }
   }, [gardensData]);
+
+  useEffect(() => {
+    // Refetch both queries when the location changes
+    refetchGardens();
+  }, [location.key, refetchGardens]);
 
   if (profileLoading) return <p>Loading your profile...</p>;
   if (profileError) return <p>Error loading profile: {profileError.message}</p>;
