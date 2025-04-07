@@ -122,6 +122,7 @@ const GardenPlanner: React.FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const gardenId = queryParams.get('gardenId');
+  const [gardensLoaded, setGardensLoaded] = useState(false);
 
 // Query to get all plants from the database
 // note - do not need data parameter from query at this time
@@ -143,12 +144,13 @@ const GardenPlanner: React.FC = () => {
   // Initialize garden grid when plot size changes
   useEffect(() => {
     // Only initialize an empty grid if we're not currently loading a garden
-    if (!isLoadingGarden) {
+    // and no garden has been loaded yet
+    if (!isLoadingGarden && !gardensLoaded) {
       setGarden(
         Array(selectedPlotSize.rows).fill(null).map(() => Array(selectedPlotSize.cols).fill(null))
       );
     }
-  }, [selectedPlotSize, isLoadingGarden]);
+  }, [selectedPlotSize, isLoadingGarden, gardensLoaded]);
 
   // GraphQL query for searching plants
   const { error, refetch } = useQuery(SEARCH_PLANTS_QUERY, {
@@ -201,54 +203,98 @@ const GardenPlanner: React.FC = () => {
       onCompleted: (data) => {
         if (data && data.garden) {
           setIsLoadingGarden(true);
-
+          console.log("Garden data loaded:", data.garden);
+  
           // Set garden name
           setGardenName(data.garden.name);
-
-          // Set plot size
+  
+          // Find the matching plot size or use default
           const plotSize = plotSizes.find(
             size => size.rows === data.garden.rows && size.cols === data.garden.cols
           ) || plotSizes[1];
+          
           setSelectedPlotSize(plotSize);
-
-          // Create populated garden grid
+  
+          // Create new empty garden grid with the correct dimensions
           const newGarden = Array(data.garden.rows)
             .fill(null)
             .map(() => Array(data.garden.cols).fill(null));
-
-          // Populate with plants
-          data.garden.plants.forEach((plant: { row: any; col: any; plantId: any; plantName: any; color: any; spacing: any; plantsPerSquareFoot: any; sunlight: any; water: any; image: any; }) => {
-            const rowIndex = Number(plant.row);
-            const colIndex = Number(plant.col);
-
-            // Make sure the indices are valid before assigning
-            if (rowIndex >= 0 && rowIndex < data.garden.rows &&
-              colIndex >= 0 && colIndex < data.garden.cols) {
-              // Ensure all required plant properties are included
-              newGarden[rowIndex][colIndex] = {
+  
+          // Log plants for debugging
+          console.log("Plants to place:", data.garden.plants);
+  
+          // Populate plants with explicit parsing of indices
+          if (data.garden.plants && data.garden.plants.length > 0) {
+            data.garden.plants.forEach((plant: any) => {
+              const rowIndex = parseInt(plant.row, 10);
+              const colIndex = parseInt(plant.col, 10);
+  
+              // Validate indices
+              if (
+                !isNaN(rowIndex) && 
+                !isNaN(colIndex) && 
+                rowIndex >= 0 && 
+                rowIndex < data.garden.rows &&
+                colIndex >= 0 && 
+                colIndex < data.garden.cols
+              ) {
+                // Create plant object with all required properties
+                newGarden[rowIndex][colIndex] = {
+                  id: plant.plantId || "",
+                  name: plant.plantName || "Unknown Plant",
+                  color: plant.color || "#4CAF50",
+                  width: 1,
+                  height: 1,
+                  spacing: parseInt(plant.spacing, 10) || 12,
+                  plantsPerSquareFoot: parseFloat(plant.plantsPerSquareFoot) || 1,
+                  sunlight: plant.sunlight || "Unknown",
+                  water: plant.water || "Unknown",
+                  image: plant.image || 'https://cdn-icons-png.flaticon.com/128/628/628324.png'
+                };
+              } else {
+                console.error(`Invalid plant placement: row=${rowIndex}, col=${colIndex}`);
+              }
+            });
+          }
+  
+          // Set the garden grid with the populated plants
+          setGarden(newGarden);
+          
+          // Add plants from garden to plantTypes palette if not already there
+          const existingPlantIds = new Set(plantTypes.map(p => p.id));
+          const newPlants: Plant[] = [];
+          
+          data.garden.plants.forEach((plant: any) => {
+            if (plant.plantId && !existingPlantIds.has(plant.plantId)) {
+              newPlants.push({
                 id: plant.plantId,
-                name: plant.plantName || "Plant",
+                name: plant.plantName || "Unknown Plant",
                 color: plant.color || "#4CAF50",
                 width: 1,
                 height: 1,
-                spacing: plant.spacing || 12,
-                plantsPerSquareFoot: plant.plantsPerSquareFoot || 1,
+                spacing: parseInt(plant.spacing, 10) || 12,
+                plantsPerSquareFoot: parseFloat(plant.plantsPerSquareFoot) || 1,
                 sunlight: plant.sunlight || "Unknown",
                 water: plant.water || "Unknown",
                 image: plant.image || 'https://cdn-icons-png.flaticon.com/128/628/628324.png'
-              };
+              });
+              existingPlantIds.add(plant.plantId);
             }
           });
-
-          // Set the garden grid directly
-          setGarden(newGarden);
-
+          
+          if (newPlants.length > 0) {
+            setPlantTypes(prevPlants => [...prevPlants, ...newPlants]);
+          }
+  
+          // Mark garden as loaded AFTER all state is updated
+          setGardensLoaded(true);
           setIsLoadingGarden(false);
         }
       },
       onError: (error) => {
         console.error("Error loading garden:", error);
         setIsLoadingGarden(false);
+        setGardensLoaded(false);
       }
     }
   );
