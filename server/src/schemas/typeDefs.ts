@@ -15,18 +15,35 @@ const typeDefs = `
 
   type Query {
     me: User
+    userGardens: [Garden]
+    garden(id: ID!): Garden
   }
 
   type PlantPlacement {
+    id: ID!
     plantId: ID!
     row: Int!
     col: Int!
+    plantName: String
+    color: String
+    spacing: Int
+    plantsPerSquareFoot: Float
+    sunlight: String
+    water: String
+    image: String
   }
 
   input PlantPlacementInput {
     plantId: ID!
     row: Int!
     col: Int!
+    plantName: String
+    color: String
+    spacing: Int
+    plantsPerSquareFoot: Float
+    sunlight: String
+    water: String
+    image: String
   }
 
   type Garden {
@@ -35,6 +52,7 @@ const typeDefs = `
     rows: Int!
     cols: Int!
     userId: ID!
+    plants: [PlantPlacement]
     createdAt: String
     updatedAt: String
   }
@@ -44,7 +62,7 @@ const typeDefs = `
     register(firstname: String!, lastname: String!, email: String!, password: String!): AuthPayload
     login(email: String!, password: String!): AuthPayload
     resetPassword(email: String!, newPassword: String!): Boolean
-    saveGarden(name: String!, rows: Int!, cols: Int! plants: [PlantPlacementInput!]): Garden
+    saveGarden(name: String!, rows: Int!, cols: Int!, plants: [PlantPlacementInput!]): Garden
   }
 `;
 
