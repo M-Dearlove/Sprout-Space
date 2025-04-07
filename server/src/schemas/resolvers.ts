@@ -2,6 +2,7 @@ import { User } from '../models/index.js';
 import GardenPlan from '../models/GardenPlan.js';
 import PlantPlacement from '../models/PlantPlacement.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
+import { getPlantCareParagraph } from '../utils/openai.js';
 import {
   RegisterUserArgs,
   LoginUserArgs,
@@ -20,7 +21,7 @@ const resolvers: IResolvers = {
   Query: {
     // Get authenticated user information
     me: async (_parent: any, _args: any, context: GraphQLContext) => {
-      console.log("Resolver Context Object:", context)
+      console.log("Resolver Context Object:", context);
       if (context && context.user) {
         return await User.findById(context.user._id);
       }

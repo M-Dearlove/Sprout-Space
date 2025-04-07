@@ -1,3 +1,4 @@
+import PlantCarePanel from '../components/PlantCarePanel';
 import React, { useState, useEffect } from 'react';
 import '../styles/Gardenplanner.css';
 import defaultPlantTypes, { Plant } from '../utils/plantData';
@@ -356,6 +357,7 @@ const GardenPlanner: React.FC = () => {
       )}
 
       <div className="garden-layout">
+      <PlantCarePanel plantName={selectedPlant?.name || ''} />
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
           <div className="controls-row">
@@ -619,20 +621,28 @@ const GardenPlanner: React.FC = () => {
                 .map(id => {
                   const plant = plantTypes.find(p => p.id === id);
                   if (!plant) return null;
-
+  
                   return (
-                    <div key={plant.id} className="legend-item" style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      padding: '5px',
-                      backgroundColor: 'white',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px'
-                    }}>
+                    <div
+                      key={plant.id}
+                      className="legend-item"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        padding: '5px',
+                        backgroundColor: 'white',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px',
+                      }}
+                    >
                       <img
                         src={plant.image}
                         alt={plant.name}
-                        style={{ width: '25px', height: '25px', marginRight: '8px' }}
+                        style={{
+                          width: '25px',
+                          height: '25px',
+                          marginRight: '8px',
+                        }}
                       />
                       <div>
                         <div style={{ fontWeight: 'bold' }}>{plant.name}</div>
@@ -783,7 +793,7 @@ const GardenPlanner: React.FC = () => {
         `}
       </style>
     </div>
-  );
+  );    
 };
 
 export default GardenPlanner;
