@@ -1,3 +1,4 @@
+//..client/src/util/plantData.ts
 import pumpkin from '../assets/images/pumpkin.png';
 import carrot from '../assets/images/carrot.png';
 import cucumber from '../assets/images/cucumber.png';

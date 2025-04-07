@@ -1,17 +1,49 @@
 import PlantCarePanel from '../components/PlantCarePanel';
 import React, { useState, useEffect } from 'react';
 import '../styles/Gardenplanner.css';
-import defaultPlantTypes, { Plant } from '../utils/plantData';
+//import defaultPlantTypes, { Plant } from '../utils/plantData';
 import { useQuery, useMutation } from '@apollo/client';
 import { SAVE_GARDEN_MUTATION } from '../graphQL/mutations';
-import { SEARCH_PLANTS_QUERY } from '../graphQL/queries';
+import { SEARCH_PLANTS_QUERY, GET_GARDEN_BY_ID, GET_ALL_PLANTS } from '../graphQL/queries';
 import { useLocation } from 'react-router-dom';
-import { GET_GARDEN_BY_ID } from '../graphQL/queries';
+
 
 import '../styles/Gardensave.css'
 
-// Define interfaces
-interface LocalPlant {
+//Define interfaces
+// interface LocalPlant {
+//   id: string;
+//   name: string;
+//   color: string;
+//   width: number;
+//   height: number;
+//   spacing: number;
+//   sunlight: string;
+//   water: string;
+//   plantsPerSquareFoot: number;
+//   image?: string;
+// }
+interface DBPlant {
+  _id: string;
+  plantName: string;
+  plantType: string;
+  plantDescription: string;
+  plantImage: string;
+  plantWatering: string;
+  plantLight: string;
+  plantSoil: string;
+  plantFertilizer: string;
+  plantHumidity: string;
+  plantTemperature: string;
+  plantToxicity: string;
+  plantPests: string;
+  plantDiseases: string;
+  spacing: number;
+  plantsPerSquareFoot: number;
+  color: string;
+}
+
+interface Plant {
   id: string;
   name: string;
   color: string;
@@ -32,15 +64,32 @@ interface PlotSize {
 }
 
 
-
 // Calculate plants per square foot based on spacing
 const calculatePlantsPerSquareFoot = (spacing: number): number => {
-  if (spacing >= 18) return 0.5; // 1 plant per 2 squares
+  if (spacing >= 18) return 0.25; // 1 plant per 4 squares
   if (spacing >= 12) return 1;
   if (spacing >= 6) return 4;
   if (spacing >= 4) return 9;
   return 16; // 3 inches or less spacing
 };
+
+// Convert database plant to local plant format
+const convertDbPlantToLocalPlant = (dbPlant: DBPlant): Plant => {
+  return {
+    id: dbPlant._id,
+    name: dbPlant.plantName,
+    color: dbPlant.color,
+    width: 1,
+    height: 1,
+    spacing: dbPlant.spacing,
+    sunlight: dbPlant.plantLight,
+    water: dbPlant.plantWatering,
+    plantsPerSquareFoot: dbPlant.plantsPerSquareFoot,
+    image: dbPlant.plantImage
+  };
+};
+
+
 
 const GardenPlanner: React.FC = () => {
   // Available plot sizes
@@ -57,10 +106,10 @@ const GardenPlanner: React.FC = () => {
   // State
   const [selectedPlotSize, setSelectedPlotSize] = useState<PlotSize>(plotSizes[1]); // Default to xxs
   const [garden, setGarden] = useState<(Plant | null)[][]>([]);
-  const [selectedPlant, setSelectedPlant] = useState<LocalPlant | null>(null);
+  const [selectedPlant, setSelectedPlant] = useState<Plant | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [plantTypes, setPlantTypes] = useState<LocalPlant[]>(defaultPlantTypes);
-  const [searchResults, setSearchResults] = useState<LocalPlant[]>([]);
+  const [plantTypes, setPlantTypes] = useState<Plant[]>([]);
+  const [searchResults, setSearchResults] = useState<Plant[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
   const [executeSearch, setExecuteSearch] = useState(false);
@@ -72,6 +121,23 @@ const GardenPlanner: React.FC = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const gardenId = queryParams.get('gardenId');
+
+// Query to get all plants from the database
+// note - do not need data parameter from query at this time
+  const { loading: plantsLoading, error: plantsError } = useQuery(GET_ALL_PLANTS, {
+  onCompleted: (data) => {
+    // Convert database plants to local plant format
+    if (data && data.plants) {
+      const convertedPlants = data.plants.map(convertDbPlantToLocalPlant);
+      setPlantTypes(convertedPlants);
+    }
+  },
+  onError: (error) => {
+    console.error('Error loading plants:', error);
+  }
+});
+
+
 
   // Initialize garden grid when plot size changes
   useEffect(() => {
@@ -93,7 +159,7 @@ const GardenPlanner: React.FC = () => {
 
       if (data && data.searchPlants && data.searchPlants.length > 0) {
         // Convert GraphQL plants to our plant format
-        const graphqlPlants: LocalPlant[] = data.searchPlants.map((plant: any) => {
+        const graphqlPlants: Plant[] = data.searchPlants.map((plant: any) => {
           // Generate a color based on plant id
           const colors = ['#ff6b6b', '#ff9f43', '#1dd1a1', '#10ac84', '#2e86de', '#f9ca24', '#6ab04c', '#eb4d4b'];
           const plantId = parseInt(plant.id);
@@ -318,13 +384,25 @@ const GardenPlanner: React.FC = () => {
       return;
     }
 
-    // Format plants for the mutation
+    // Format plants for the mutation, including additional details
     const plants = garden.flatMap((row, rowIndex) =>
       row.flatMap((plant, colIndex) =>
-        plant ? [{ plantId: plant.id, row: rowIndex, col: colIndex }] : []
+        plant ? [{
+          plantId: plant.id,
+          row: rowIndex,
+          col: colIndex,
+          // Include additional plant details for databse
+          plantName: plant.name,
+          color: plant.color,
+          spacing: plant.spacing,
+          plantsPerSquareFoot: plant.plantsPerSquareFoot,
+          sunlight: plant.sunlight,
+          water: plant.water,
+          // Store image path instead of the binary image so not storing it multiple times per garden
+          image: plant.image
+        }] : []
       )
     );
-
     // Execute the mutation
     saveGarden({
       variables: {
@@ -350,6 +428,16 @@ const GardenPlanner: React.FC = () => {
     <div className="garden-planner">
       <h1>Square Foot Garden Planner</h1>
       <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
+
+      {/* Plants loading message */}
+      {plantsLoading && (
+        <div className="loading-message">Loading plants...</div>
+      )}
+
+      {/* Error message for plants */}
+      {plantsError && (
+        <div className="error-message">Error loading plants: {plantsError.message}</div>
+      )}
 
       {/* Save Success Message */}
       {saveSuccess && (

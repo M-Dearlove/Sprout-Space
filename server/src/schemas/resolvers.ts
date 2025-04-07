@@ -1,5 +1,6 @@
 import { User } from '../models/index.js';
 import GardenPlan from '../models/GardenPlan.js';
+import Plant from '../models/Plant.js';
 import PlantPlacement from '../models/PlantPlacement.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
 import { getPlantCareParagraph } from '../utils/openai.js';
@@ -39,12 +40,12 @@ const resolvers: IResolvers = {
         const plants = await PlantPlacement.find({ gardenId: garden._id }) as Array<{ _id: any; plantId: string; row: number; col: number }>;
 
         return {
-          id: garden._id.toString(),  // Explicitly convert to string
+          id: garden._id.toString(),  
           name: garden.name,
           rows: garden.rows,
           cols: garden.cols,
           plants: plants.map(plant => ({
-            id: plant._id.toString(),  // Explicitly convert to string
+            id: plant._id.toString(), 
             plantId: plant.plantId,
             row: plant.row,
             col: plant.col
@@ -94,10 +95,53 @@ const resolvers: IResolvers = {
     // Get plant care paragraph
     getPlantCareInfo: async (_parent: any, args: { plantName: string }) => {
       return await getPlantCareParagraph(args.plantName);
-    }
+    },
+  
+   // Plant queries
+   plants: async () => {
+     try {
+       return await Plant.find({});
+     } catch (error) {
+       console.error('Error fetching plants:', error);
+       throw new Error('Failed to fetch plants');
+     }
+   },
+
+   plant: async (_parent: any, { _id }: { _id: string }) => {
+     try {
+       return await Plant.findById(_id);
+     } catch (error) {
+       console.error(`Error fetching plant with ID ${_id}:`, error);
+       throw new Error('Failed to fetch plant');
+     }
+   },
+
+   plantByName: async (_parent: any, { plantName }: { plantName: string }) => {
+     try {
+      // Case-insensitive search for plant by name
+       return await Plant.findOne({ 
+         plantName: { $regex: new RegExp('^' + plantName + '$', 'i') } 
+       });
+     } catch (error) {
+       console.error(`Error fetching plant with name ${plantName}:`, error);
+       throw new Error('Failed to fetch plant by name');
+     }
+   },
+
+   searchPlantsByType: async (_parent: any, { plantType }: { plantType: string }) => {
+     try {
+       // Case-insensitive search for plants by type
+       return await Plant.find({ 
+         plantType: { $regex: new RegExp(plantType, 'i') } 
+       });
+     } catch (error) {
+       console.error(`Error searching plants by type ${plantType}:`, error);
+       throw new Error('Failed to search plants by type');
+     }
+   },
   },
 
-    Mutation: {
+  Mutation: {
       // Register a new user
       register: async (_parent: any, { firstname, lastname, email, password }: RegisterUserArgs) => {
         const existingUser = await User.findOne({ email });

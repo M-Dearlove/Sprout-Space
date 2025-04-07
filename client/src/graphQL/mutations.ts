@@ -35,7 +35,7 @@ export const RESET_PASSWORD = gql`
 
 //Garden Planner mutations
 export const SAVE_GARDEN_MUTATION = gql`
-  mutation SaveGarden($name: String!, $rows: Int!, $cols: Int!, $plants: [PlantPlacementInput!]!) {
+  mutation SaveGarden($name: String!, $rows: Int!, $cols: Int!, $plants: [PlantInput!]!) {
     saveGarden(name: $name, rows: $rows, cols: $cols, plants: $plants) {
       id
       name

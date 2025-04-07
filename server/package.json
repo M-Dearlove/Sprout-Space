@@ -9,7 +9,7 @@
     "start": "node dist/server.js --ignore client",
     "dev": "npx nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "seed": "node dist/seeds/index.js"
+    "seed": "node dist/seeds/seed.js"
   },
   "repository": {
     "type": "git",
