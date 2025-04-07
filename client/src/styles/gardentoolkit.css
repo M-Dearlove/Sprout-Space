@@ -1,0 +1,344 @@
+/* GardenToolkit.css */
+
+/* Garden Toolkit Container - Bold vibrant styling */
+.garden-toolkit-container {
+    background-color: var(--brand-secondary);
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    font-family: Arial, sans-serif;
+    max-width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Bold vibrant toggle button */
+  .toolkit-toggle-button {
+    padding: 6px 12px;
+    background-color: var(--brand-accent-dark);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    width: auto;
+    max-width: 230px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease;
+    letter-spacing: 0.3px;
+    min-height: 28px;
+    text-transform: uppercase;
+  }
+  
+  .toolkit-toggle-button:hover {
+    background-color: var(--brand-accent);
+    transform: translateY(-1px);
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  .toolkit-toggle-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--brand-accent-dark-rgb, 0, 100, 0), 0.3);
+  }
+  
+  /* Collapsible content - vibrant and bold */
+  .toolkit-content {
+    background-color: white !important;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Search input - bold styling */
+  .toolkit-search-container {
+    margin-bottom: 12px;
+  }
+  
+  .toolkit-search-input {
+    width: 100%;
+    padding: 8px 12px;
+    border: 2px solid var(--brand-accent);
+    border-radius: 6px;
+    font-size: 12px;
+    background-color: white;
+    color: var(--brand-text);
+    transition: all 0.2s ease;
+  }
+  
+  .toolkit-search-input:focus {
+    border-color: var(--brand-accent-dark);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--brand-accent-dark-rgb, 0, 100, 0), 0.15);
+  }
+  
+  .toolkit-search-input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+    font-style: italic;
+  }
+  
+  /* Filter buttons - vibrant styling */
+  .filter-buttons {
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+  
+  .filter-label {
+    margin-right: 8px;
+    color: var(--brand-text);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .filter-button {
+    border: none;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 11px;
+    background-color: #f1f1f1;
+    color: var(--brand-text);
+    font-weight: 600;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .filter-button:hover {
+    background-color: #e8e8e8;
+    transform: translateY(-1px);
+  }
+  
+  .filter-button-active {
+    background-color: var(--brand-accent-dark);
+    color: white;
+  }
+  
+  /* Density Legend - vibrant look */
+  .density-legend {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background-color: white !important;
+    border-radius: 8px;
+    border: 1px solid var(--brand-accent);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .legend-title {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: var(--brand-text);
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+  }
+  
+  .density-indicators {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  .density-indicator {
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    background-color: white;
+    border-left-width: 0;
+    border-left-style: solid;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Density indicator colors - vibrant colors */
+  .density-very-low {
+    background-color: #4CAF50;
+  }
+  
+  .density-low {
+    background-color: #8BC34A;
+  }
+  
+  .density-medium {
+    background-color: #CDDC39;
+    color: #333;
+  }
+  
+  .density-high {
+    background-color: #FFC107;
+    color: #333;
+  }
+  
+  .density-very-high {
+    background-color: #FF9800;
+  }
+  
+  .density-ultra-high {
+    background-color: #FF5722;
+  }
+  
+  /* Plants heading - bold typography */
+  .plants-heading {
+    color: var(--brand-text);
+    margin-bottom: 2px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+  }
+  
+  .plants-instructions {
+    color: rgba(0, 0, 0, 0.6);
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-style: italic;
+  }
+  
+  /* Vegetable Grid - vibrant layout */
+  .vegetable-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  
+  /* Vegetable Card - vibrant card design */
+  .vegetable-card {
+    border-radius: 8px;
+    padding: 10px;
+    margin: 0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-color: white !important;
+    border: 1px solid #e0e0e0;
+    border-left-width: 0;
+    border-top-width: 4px;
+    border-top-style: solid;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .vegetable-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .vegetable-card-selected {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--brand-accent-dark) !important;
+    border-top-width: 4px !important;
+  }
+  
+  .vegetable-title {
+    margin: 0 0 6px 0;
+    color: var(--brand-text);
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+  
+  .vegetable-details {
+    font-size: 11px;
+    color: var(--brand-text);
+    line-height: 1.4;
+  }
+  
+  .density-info {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+    align-items: center;
+  }
+  
+  .density-tag {
+    padding: 2px 6px;
+    border-radius: 20px;
+    font-size: 9px;
+    background-color: #f1f1f1;
+    color: var(--brand-text);
+    font-weight: 600;
+  }
+  
+  .density-tag-selected {
+    background-color: var(--brand-accent-dark);
+    color: white;
+  }
+  
+  .spacing-info, .water-info {
+    margin-bottom: 4px;
+  }
+  
+  .expanded-info {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background-color: #f9f9f9 !important;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+  
+  /* Watering Information - vibrant panel */
+  .watering-info {
+    margin-top: 6px;
+    padding: 12px;
+    background-color: white !important;
+    border-radius: 8px;
+    border: 1px solid var(--brand-accent);
+    font-size: 11px;
+    line-height: 1.4;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .watering-info-title {
+    margin-top: 0;
+    color: var(--brand-text);
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+  }
+  
+  .watering-info p {
+    margin: 0 0 3px 0;
+  }
+  
+  .watering-info-list {
+    margin: 3px 0 0 0;
+    padding-left: 16px;
+    color: var(--brand-text);
+  }
+  
+  .watering-info-list li {
+    margin-bottom: 2px;
+  }
+  
+  .no-results {
+    text-align: center;
+    padding: 20px;
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.6);
+    font-style: italic;
+  }
+  
+  /* Make the component more responsive */
+  @media (max-width: 768px) {
+    .vegetable-grid {
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 8px;
+    }
+  }

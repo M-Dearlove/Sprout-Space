@@ -7,6 +7,7 @@ import {SAVE_GARDEN_MUTATION } from '../graphQL/mutations';
 import { SEARCH_PLANTS_QUERY } from '../graphQL/queries';
 
 import '../styles/Gardensave.css'
+import GardenToolkit from '../components/gardentoolkit';
 
 // Define interfaces
 interface LocalPlant {
@@ -272,6 +273,7 @@ const GardenPlanner: React.FC = () => {
     window.print();
   };
 
+
   // Filter plants based on local filtering (not GraphQL search)
   const filteredPlants = plantTypes.filter(plant => 
     !searchTerm || plant.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -281,14 +283,20 @@ const GardenPlanner: React.FC = () => {
     <div className="garden-planner">
       <h1>Square Foot Garden Planner</h1>
       <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
-      
+      <PlantCarePanel plantName={selectedPlant?.name || ''} />
+
+           {/* Garden Toolkit */}
+     <div className="garden-layout">
+     <GardenToolkit />
+     <div className="garden-controls"></div>
+         </div>
+      {/* Error Message */}
       {/* Save Success Message */}
       {saveSuccess && (
         <div className="save-success">{saveSuccess}</div>
       )}
       
       <div className="garden-layout">
-      <PlantCarePanel plantName={selectedPlant?.name || ''} />
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
           <div className="controls-row">
@@ -310,12 +318,7 @@ const GardenPlanner: React.FC = () => {
                 </button>
               </form>
               
-              {/* GraphQL Endpoint Notice */}
-              {!import.meta.env.VITE_GRAPHQL_ENDPOINT && (
-                <div className="search-error">
-                  GraphQL endpoint not configured. Check your .env file.
-                </div>
-              )}
+          
               
               {/* Search Results */}
               {searchResults.length > 0 && (
@@ -495,7 +498,7 @@ const GardenPlanner: React.FC = () => {
             <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet (Each square = 1 sq ft)</p>
           </div>
         </div>
-        
+     
         {/* Plant Selection (bottom) */}
         <div className="plant-selection-bottom">
           <div className="plant-items" style={{ 
