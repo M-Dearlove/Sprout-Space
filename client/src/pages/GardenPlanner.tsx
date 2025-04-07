@@ -76,12 +76,12 @@ const GardenPlanner: React.FC = () => {
   // Initialize garden grid when plot size changes
   useEffect(() => {
     // Only initialize an empty grid if we're not currently loading a garden
-  if (!isLoadingGarden) {
-    setGarden(
-      Array(selectedPlotSize.rows).fill(null).map(() => Array(selectedPlotSize.cols).fill(null))
-    );
-  }
-}, [selectedPlotSize, isLoadingGarden]);
+    if (!isLoadingGarden) {
+      setGarden(
+        Array(selectedPlotSize.rows).fill(null).map(() => Array(selectedPlotSize.cols).fill(null))
+      );
+    }
+  }, [selectedPlotSize, isLoadingGarden]);
 
   // GraphQL query for searching plants
   const { error, refetch } = useQuery(SEARCH_PLANTS_QUERY, {
@@ -134,29 +134,29 @@ const GardenPlanner: React.FC = () => {
       onCompleted: (data) => {
         if (data && data.garden) {
           setIsLoadingGarden(true);
-          
+
           // Set garden name
           setGardenName(data.garden.name);
-  
+
           // Set plot size
           const plotSize = plotSizes.find(
             size => size.rows === data.garden.rows && size.cols === data.garden.cols
           ) || plotSizes[1];
           setSelectedPlotSize(plotSize);
-  
+
           // Create populated garden grid
           const newGarden = Array(data.garden.rows)
             .fill(null)
             .map(() => Array(data.garden.cols).fill(null));
-  
+
           // Populate with plants
           data.garden.plants.forEach((plant: { row: any; col: any; plantId: any; plantName: any; color: any; spacing: any; plantsPerSquareFoot: any; sunlight: any; water: any; image: any; }) => {
             const rowIndex = Number(plant.row);
             const colIndex = Number(plant.col);
-            
+
             // Make sure the indices are valid before assigning
-            if (rowIndex >= 0 && rowIndex < data.garden.rows && 
-                colIndex >= 0 && colIndex < data.garden.cols) {
+            if (rowIndex >= 0 && rowIndex < data.garden.rows &&
+              colIndex >= 0 && colIndex < data.garden.cols) {
               // Ensure all required plant properties are included
               newGarden[rowIndex][colIndex] = {
                 id: plant.plantId,
@@ -172,10 +172,10 @@ const GardenPlanner: React.FC = () => {
               };
             }
           });
-  
+
           // Set the garden grid directly
           setGarden(newGarden);
-          
+
           setIsLoadingGarden(false);
         }
       },
@@ -185,7 +185,7 @@ const GardenPlanner: React.FC = () => {
       }
     }
   );
-  
+
   // GraphQL mutation for saving gardens
   const [saveGarden, { loading: saveLoading }] = useMutation(SAVE_GARDEN_MUTATION, {
     onCompleted: (data) => {
@@ -357,7 +357,6 @@ const GardenPlanner: React.FC = () => {
       )}
 
       <div className="garden-layout">
-      <PlantCarePanel plantName={selectedPlant?.name || ''} />
         <div className="garden-controls">
           {/* Search Bar and Plot Size Selector */}
           <div className="controls-row">
@@ -378,13 +377,6 @@ const GardenPlanner: React.FC = () => {
                   {isSearching ? "..." : "Search"}
                 </button>
               </form>
-
-              {/* GraphQL Endpoint Notice */}
-              {!import.meta.env.VITE_GRAPHQL_ENDPOINT && (
-                <div className="search-error">
-                  GraphQL endpoint not configured. Check your .env file.
-                </div>
-              )}
 
               {/* Search Results */}
               {searchResults.length > 0 && (
@@ -621,7 +613,7 @@ const GardenPlanner: React.FC = () => {
                 .map(id => {
                   const plant = plantTypes.find(p => p.id === id);
                   if (!plant) return null;
-  
+
                   return (
                     <div
                       key={plant.id}
@@ -654,6 +646,11 @@ const GardenPlanner: React.FC = () => {
                   );
                 })}
             </div>
+            <div className="plantcare-container">
+            <PlantCarePanel
+              plantName={selectedPlant?.name || ''}
+            />
+          </div>
           </div>
         </div>
       </div>
@@ -793,7 +790,7 @@ const GardenPlanner: React.FC = () => {
         `}
       </style>
     </div>
-  );    
+  );
 };
 
 export default GardenPlanner;

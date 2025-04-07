@@ -17,6 +17,7 @@ const typeDefs = `
     me: User
     userGardens: [Garden]
     garden(id: ID!): Garden
+    getPlantCareInfo(plantName: String!): String
   }
 
   type PlantPlacement {

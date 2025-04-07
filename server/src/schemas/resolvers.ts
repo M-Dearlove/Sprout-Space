@@ -90,6 +90,10 @@ const resolvers: IResolvers = {
         userId: garden.userId,
         plants: enhancedPlants,
       };
+    },
+    // Get plant care paragraph
+    getPlantCareInfo: async (_parent: any, args: { plantName: string }) => {
+      return await getPlantCareParagraph(args.plantName);
     }
   },
 

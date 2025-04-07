@@ -1,0 +1,27 @@
+.plant-care-panel {
+    background-color: var(--brand-accent);
+    padding: 16px;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .panel-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: var(--brand-text);
+  }
+  
+  .loading-text {
+    font-size: 0.875rem;
+    font-style: italic;
+  }
+  
+  .care-info-text {
+    font-size: 0.875rem;
+    line-height: 1.625;
+    white-space: pre-line;
+  }
