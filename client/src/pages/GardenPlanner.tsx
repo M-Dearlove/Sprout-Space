@@ -309,13 +309,7 @@ const GardenPlanner: React.FC = () => {
                   {isSearching ? "..." : "Search"}
                 </button>
               </form>
-              
-              {/* GraphQL Endpoint Notice */}
-              {!import.meta.env.VITE_GRAPHQL_ENDPOINT && (
-                <div className="search-error">
-                  GraphQL endpoint not configured. Check your .env file.
-                </div>
-              )}
+         
               
               {/* Search Results */}
               {searchResults.length > 0 && (
