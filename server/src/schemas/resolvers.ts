@@ -2,6 +2,7 @@ import { User } from '../models/index.js';
 import GardenPlan from '../models/GardenPlan.js';
 import PlantPlacement from '../models/PlantPlacement.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
+import { getPlantCareParagraph } from '../utils/openai.js';
 import {
   RegisterUserArgs,
   LoginUserArgs,
@@ -18,11 +19,16 @@ const resolvers = {
   Query: {
     // Get authenticated user information
     me: async (_parent: any, _args: any, context: GraphQLContext) => {
-      console.log("Resolver Context Object:", context)
+      console.log("Resolver Context Object:", context);
       if (context && context.user) {
         return await User.findById(context.user._id);
       }
       throw new AuthenticationError('Could not authenticate user.');
+    },
+
+    // Get plant care paragraph
+    getPlantCareInfo: async (_parent: any, args: { plantName: string }) => {
+      return await getPlantCareParagraph(args.plantName);
     },
   },
 
@@ -36,9 +42,9 @@ const resolvers = {
       }
 
       const user = await User.create({ firstname, lastname, email, password });
-      console.log('User created', user)
-      const token = signToken( user.email, user._id);
-      console.log('token', token)
+      console.log('User created', user);
+      const token = signToken(user.email, user._id);
+      console.log('token', token);
 
       return { token, user };
     },
@@ -129,6 +135,5 @@ const resolvers = {
     }
   }
 };
-
 
 export default resolvers;
