@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom';
 
 
 import '../styles/Gardensave.css'
+import GardenToolkit from '../components/gardentoolkit';
 
 //Define interfaces
 // interface LocalPlant {
@@ -419,6 +420,7 @@ const GardenPlanner: React.FC = () => {
     window.print();
   };
 
+
   // Filter plants based on local filtering (not GraphQL search)
   const filteredPlants = plantTypes.filter(plant =>
     !searchTerm || plant.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -429,6 +431,15 @@ const GardenPlanner: React.FC = () => {
       <h1>Square Foot Garden Planner</h1>
       <p className="intro-text">Plan your garden using 1×1 foot squares. Each square can hold different numbers of plants based on spacing requirements.</p>
 
+      <PlantCarePanel plantName={selectedPlant?.name || ''} />
+
+           {/* Garden Toolkit */}
+     <div className="garden-layout">
+     <GardenToolkit />
+     <div className="garden-controls"></div>
+         </div>
+      {/* Error Message */}
+        
       {/* Plants loading message */}
       {plantsLoading && (
         <div className="loading-message">Loading plants...</div>
@@ -438,6 +449,7 @@ const GardenPlanner: React.FC = () => {
       {plantsError && (
         <div className="error-message">Error loading plants: {plantsError.message}</div>
       )}
+
 
       {/* Save Success Message */}
       {saveSuccess && (
@@ -644,7 +656,7 @@ const GardenPlanner: React.FC = () => {
             <p>Grid size: {selectedPlotSize.rows} × {selectedPlotSize.cols} feet (Each square = 1 sq ft)</p>
           </div>
         </div>
-
+    
         {/* Plant Selection (bottom) */}
         <div className="plant-selection-bottom">
           <div className="plant-items" style={{
