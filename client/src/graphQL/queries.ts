@@ -30,3 +30,43 @@ export const SEARCH_PLANTS_QUERY = gql`
   }
 `;
 
+export const GET_USER_GARDENS = gql`
+  query GetUserGardens {
+    userGardens {
+      id
+      name
+      rows
+      cols
+      plants {
+        id
+        plantId
+        row
+        col
+      }
+    }
+  }
+`;
+
+export const GET_GARDEN_BY_ID = gql`
+  query GetGardenById($id: ID!) {
+    garden(id: $id) {
+      id
+      name
+      rows
+      cols
+      plants {
+        id
+        plantId
+        row
+        col
+        plantName
+        color
+        spacing
+        plantsPerSquareFoot
+        sunlight
+        water
+        image
+      }
+    }
+  }
+`;

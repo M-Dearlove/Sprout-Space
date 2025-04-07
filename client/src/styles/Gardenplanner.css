@@ -241,6 +241,12 @@
 }
 
 /* Garden Grid Area */
+
+.plantcare-container {
+  flex-grow: 1;
+  max-width: 100%;
+}
+
 .garden-area {
   margin: 20px 0;
 }
@@ -347,6 +353,11 @@
 .plant-item-selected {
   border-color: var(--brand-primary) !important;
   background-color: #f0fff0 !important;
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
 }
 
 .legend h3 {
