@@ -477,22 +477,23 @@ const plantSeeds = [
 ];
 
 const seedDB = async ():Promise<void> => {
-  try {
-    // Connect to the database
-    await db();
-    console.log('Connected to the database');
-    await cleanDB();
-
-
-    // Insert new plant documents
-    await Plant.insertMany(plantSeeds);
-    console.log(`${plantSeeds.length} plants inserted into database`);
+  if (process.env.SEED_DATABASE === 'true') {
+    try {
+      // Connect to the database
+      await db();
+      console.log('Connected to the database');
+      await cleanDB();
+      // Insert new plant documents
+       await Plant.insertMany(plantSeeds);
+       console.log(`${plantSeeds.length} plants inserted into database`);
     
-    console.log('Database seeded successfully!');
-    process.exit(0);
-  } catch (err) {
-    console.error('Error seeding database:', err);
-    process.exit(1);
+       console.log('Database seeded successfully!');
+       process.exit(0);
+    
+   } catch (err) {
+       console.error('Error seeding database:', err);
+       process.exit(1);
+   }
   }
 };
 seedDB();
