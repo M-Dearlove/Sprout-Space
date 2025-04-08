@@ -3,6 +3,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_USERS, QUERY_ME } from '../graphQL/queries';
 import { SET_USER_ROLE, DELETE_USER } from '../graphQL/mutations';
 import { useNavigate } from 'react-router-dom';
+import EditUserButton from '../components/EditUserButton';
 import '../styles/Admin.css';
 
 const AdminPage: React.FC = () => {
@@ -35,7 +36,7 @@ const AdminPage: React.FC = () => {
     }
   });
 
-  // Delete user mutation
+  // Delete user
   const [deleteUser, { loading: deletingUser }] = useMutation(DELETE_USER, {
     onCompleted: () => {
       setMessage({ text: 'User deleted successfully', type: 'success' });
@@ -70,7 +71,7 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  // Filter and sort users
+  // Filter for sorting users
   const getFilteredAndSortedUsers = () => {
     if (!data || !data.users) return [];
 
@@ -193,6 +194,10 @@ const handleDeleteUser = (userId: string, firstName: string, lastName: string) =
                     </td>
                     <td>{user.createdAt ? new Date(parseInt(user.createdAt)).toLocaleDateString() : 'N/A'}</td>
                     <td className='action-buttons'>
+                    <EditUserButton 
+                        user={user} 
+                        refetch={refetch} 
+                      />
                       <button 
                         className="role-toggle-btn"
                         onClick={() => handleRoleToggle(user._id, user.role || 'user')}

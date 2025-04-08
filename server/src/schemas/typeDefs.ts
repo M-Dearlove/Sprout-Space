@@ -15,6 +15,13 @@ const typeDefs = `
     token: String
   }
 
+  input UserUpdateInput {
+    firstname: String
+    lastname: String
+    email: String
+    role: String
+  }
+
   type Query {
     me: User
     users: [User] 
@@ -94,6 +101,7 @@ const typeDefs = `
     deleteGarden(id: ID!): Garden
     setUserRole(userId: ID!, role: String!): User
     deleteUser(userId: ID!): User
+     updateUser(userId: ID!, userData: UserUpdateInput!): User
   }
 `;
 

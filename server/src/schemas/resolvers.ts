@@ -224,6 +224,48 @@ const resolvers: IResolvers = {
         return deletedUser;
       },
 
+      //update user
+      updateUser: async (
+        _parent: any, 
+        { userId, userData }: { userId: string; userData: { firstname?: string; lastname?: string; email?: string; role?: string } }, 
+        context: GraphQLContext
+      ) => {
+        // Check if current user is logged in
+        if (!context.user) {
+          throw new AuthenticationError('You must be logged in to perform this action');
+        }
+      
+        // Check if current user is an admin
+        const currentUser = await User.findById(context.user._id);
+        if (!currentUser || currentUser.role !== 'admin') {
+          throw new AuthenticationError('You must be an admin to update users');
+        }
+      
+        // Find the user to update
+        const userToUpdate = await User.findById(userId);
+        if (!userToUpdate) {
+          throw new Error('User not found');
+        }
+      
+        // Validate email is unique
+        if (userData.email && userData.email !== userToUpdate.email) {
+          const existingUser = await User.findOne({ email: userData.email });
+          if (existingUser) {
+            throw new Error('A user with this email already exists');
+          }
+        }
+      
+      // Update the user
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: userData },
+        { new: true, runValidators: true }
+      );
+      
+      return updatedUser;
+    },
+
+
       //rest password
       resetPassword: async (_parent: any, { email, newPassword }: ResetPasswordArgs) => {
         const user = await User.findOne({ email });
