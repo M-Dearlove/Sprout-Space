@@ -93,6 +93,7 @@ const typeDefs = `
     saveGarden(name: String!, rows: Int!, cols: Int!, plants: [PlantInput!]): Garden
     deleteGarden(id: ID!): Garden
     setUserRole(userId: ID!, role: String!): User
+    deleteUser(userId: ID!): User
   }
 `;
 

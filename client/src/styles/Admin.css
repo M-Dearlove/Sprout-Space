@@ -1,4 +1,4 @@
-/* Admin.css - Following the app's styling */
+/* Admin.css  */
 .admin-container {
   display: flex;
   flex-direction: column;
@@ -154,6 +154,14 @@
   color: white;
 }
 
+/* Action buttons container */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
 /* Role toggle button styling */
 .role-toggle-btn {
   background-color: var(--brand-accent);
@@ -172,6 +180,27 @@
 
 .role-toggle-btn:disabled {
   background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+/* Delete user button styling */
+.delete-user-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-user-btn:hover {
+  background-color: #c0392b;
+}
+
+.delete-user-btn:disabled {
+  background-color: #f5b7b1;
   cursor: not-allowed;
 }
 
@@ -204,7 +233,8 @@
     font-size: 1rem;
   }
   
-  .role-toggle-btn {
+  .role-toggle-btn,
+  .delete-user-btn {
     padding: 6px 10px;
     font-size: 0.9rem;
   }
