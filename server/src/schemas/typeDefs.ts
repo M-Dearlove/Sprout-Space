@@ -89,8 +89,8 @@ const typeDefs = `
     login(email: String!, password: String!): AuthPayload
     resetPassword(email: String!, newPassword: String!): Boolean
     saveGarden(name: String!, rows: Int!, cols: Int!, plants: [PlantInput!]): Garden
+    deleteGarden(id: ID!): Garden
   }
 `;
-
 
 export default typeDefs;

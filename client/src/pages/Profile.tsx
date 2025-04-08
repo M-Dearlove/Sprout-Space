@@ -1,5 +1,6 @@
-import { useQuery } from '@apollo/client';
+import { useQuery, useMutation } from '@apollo/client';
 import { QUERY_ME, GET_USER_GARDENS } from '../graphQL/queries';
+import { DELETE_GARDEN_MUTATION } from '../graphQL/mutations';
 import '../styles/Profile.css';
 import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
@@ -15,6 +16,19 @@ const ProfilePage = () => {
   });
 
   const [gardens, setGardens] = useState<GardenCardProps['garden'][]>([]);
+  const [deleteInProgress, setDeleteInProgress] = useState<string | null>(null);
+
+  // Add delete garden mutation
+  const [deleteGarden] = useMutation(DELETE_GARDEN_MUTATION, {
+    onCompleted: () => {
+      setDeleteInProgress(null);
+      refetchGardens(); // Refresh the garden list after deletion
+    },
+    onError: (error) => {
+      console.error("Error deleting garden:", error);
+      setDeleteInProgress(null);
+    }
+  });
 
   useEffect(() => {
     if (gardensData && gardensData.userGardens) {
@@ -26,6 +40,17 @@ const ProfilePage = () => {
     // Refetch both queries when the location changes
     refetchGardens();
   }, [location.key, refetchGardens]);
+
+  // Handle garden deletion
+  const handleDeleteGarden = (gardenId: string) => {
+    // Show confirmation before deleting
+    if (window.confirm("Are you sure you want to delete this garden plan? This action cannot be undone.")) {
+      setDeleteInProgress(gardenId);
+      deleteGarden({ 
+        variables: { id: gardenId }
+      });
+    }
+  };
 
   if (profileLoading) return <p>Loading your profile...</p>;
   if (profileError) return <p>Error loading profile: {profileError.message}</p>;
@@ -52,13 +77,18 @@ const ProfilePage = () => {
           ) : hasGardens ? (
             <div className="garden-grid">
               {gardens.map(garden => (
-                <GardenCard key={garden.id} garden={garden} />
+                <GardenCard 
+                  key={garden.id} 
+                  garden={garden} 
+                  onDelete={handleDeleteGarden}
+                  isDeleting={deleteInProgress === garden.id}
+                />
               ))}
             </div>
           ) : (
             <div className="no-gardens">
               <p>You have no garden plots saved</p>
-              <Link to="/planner" className="create-garden-btn">Create Your First Garden</Link>
+              <Link to="/garden-planner" className="create-garden-btn">Create Your First Garden</Link>
             </div>
           )}
         </div>
@@ -67,7 +97,7 @@ const ProfilePage = () => {
   );
 };
 
-// Updated Garden card component to display each saved garden
+// Updated Garden card component with delete functionality
 interface GardenCardProps {
   garden: {
     id: string;
@@ -83,9 +113,11 @@ interface GardenCardProps {
       image?: string;
     }[];
   };
+  onDelete: (id: string) => void;
+  isDeleting: boolean;
 }
 
-const GardenCard = ({ garden }: GardenCardProps) => {
+const GardenCard = ({ garden, onDelete, isDeleting }: GardenCardProps) => {
   const plantCount = garden.plants ? garden.plants.length : 0;
   
   return (
@@ -103,13 +135,21 @@ const GardenCard = ({ garden }: GardenCardProps) => {
           <Link to={`/garden-planner?gardenId=${garden.id}`} className="edit-garden-btn">
             Edit Garden
           </Link>
+          <button 
+            className="delete-garden-btn"
+            onClick={() => onDelete(garden.id)}
+            disabled={isDeleting}
+          >
+            {isDeleting ? 'Deleting...' : 'Delete Garden'}
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-// Updated garden preview component with improved image display
+
+// Garden preview component remains unchanged
 interface PlantInfo {
   id: string;
   plantName?: string;

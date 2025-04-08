@@ -251,6 +251,38 @@ const resolvers: IResolvers = {
           console.error('Error saving garden:', error);
           throw new Error(`Failed to save garden: ${error.message}`);
         }
+      },
+
+      deleteGarden: async (_parent: any, { id }: { id: string }, context: GraphQLContext) => {
+        // Check if user is authenticated
+        if (!context.user) {
+          throw new AuthenticationError('You must be logged in to delete a garden');
+        }
+      
+        try {
+          // Find the garden
+          const garden = await GardenPlan.findById(id);
+          
+          // Check if garden exists and belongs to the user
+          if (!garden) {
+            throw new Error('Garden not found');
+          }
+          
+          if (garden.userId.toString() !== context.user._id.toString()) {
+            throw new AuthenticationError('You do not have permission to delete this garden');
+          }
+      
+          // Delete all plant placements associated with this garden
+          await PlantPlacement.deleteMany({ gardenId: id });
+          
+          // Delete the garden
+          await GardenPlan.findByIdAndDelete(id);
+          
+          return { id };
+        } catch (error: any) {
+          console.error('Error deleting garden:', error);
+          throw new Error(`Failed to delete garden: ${error.message}`);
+        }
       }
     }
   };

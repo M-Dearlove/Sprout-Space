@@ -44,3 +44,11 @@ export const SAVE_GARDEN_MUTATION = gql`
     }
   }
 `;
+
+export const DELETE_GARDEN_MUTATION = gql`
+  mutation DeleteGarden($id: ID!) {
+    deleteGarden(id: $id) {
+      id
+    }
+  }
+`;
