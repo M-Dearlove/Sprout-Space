@@ -4,13 +4,27 @@ import bcrypt from 'bcrypt';
 // Define an interface for the User document
 interface IUser extends Document {
   email: string;
+  firstname: string;
+  lastname: string;
   password: string;
+  role: string;
+  createdAt: string;
   isCorrectPassword(password: string): Promise<boolean>;
 }
 
 // Define the schema for the User document
 const userSchema = new Schema<IUser>(
   {
+    firstname: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    lastname: {
+      type: String,
+      required: true,
+      trim: true,
+    },
     email: {
       type: String,
       required: true,
@@ -22,6 +36,12 @@ const userSchema = new Schema<IUser>(
       required: true,
       minlength: 5,
     },
+    role: {
+      type: String,
+      default: 'user',
+      enum: ['user', 'admin'],
+    },
+   
   },
   {
     timestamps: true,

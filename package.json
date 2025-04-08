@@ -17,6 +17,7 @@
     "client:dev": "cd client && npm run dev",
     "build": "npm run server:build && npm run client:build",
     "seed": "cd server && npm run seed",
+    "seed-user": "cd server && npm run seed-user",
     "render-build": "npm install && npm run server:build && npm run client:build"
   },
   "repository": {
@@ -40,7 +41,10 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/react-router-dom": "^5.3.3",
+    "autoprefixer": "^10.4.21",
     "concurrently": "^9.1.2",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.1",
     "wait-on": "^8.0.3"
   }
 }
