@@ -370,34 +370,104 @@
 
 /* Print Styles */
 @media print {
-  body {
-    background-color: white;
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
   }
   
-  .garden-planner {
-    padding: 0;
+  /* Only show the garden grid, legend, and their children */
+  .garden-area, 
+  .garden-area *,
+  .legend,
+  .legend * {
+    visibility: visible;
   }
   
+  /* Position the garden grid at the top of the page */
+  .garden-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  /* Position the legend below the garden grid */
+  .legend {
+    position: absolute;
+    top: auto;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    page-break-inside: avoid;
+  }
+  
+  /* Legend title */
+  .legend h3 {
+    text-align: center;
+    margin-bottom: 15px;
+  }
+  
+  /* Legend items container */
+  .legend-items {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  /* Individual legend item */
+  .legend-item {
+    display: flex !important;
+    align-items: center;
+    padding: 5px;
+    background-color: white !important;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-width: 200px;
+  }
+  
+  /* Plant image in legend */
+  .legend-item img {
+    width: 25px;
+    height: 25px;
+    margin-right: 8px;
+  }
+  
+  /* Hide PlantCarePanel in print view */
+  .plantcare-container {
+    display: none !important;
+  }
+  
+  /* Hide specific elements even if they're inside the garden area */
   .garden-controls, 
   .search-container, 
   .plant-selection-bottom,
   .clear-button, 
-  .print-button {
+  .print-button,
+  .add-row-button,
+  .add-column-button,
+  .garden-size-controls,
+  .plant-list-container {
     display: none !important;
   }
   
+  /* Show a title at the top when printing */
   .garden-title-print {
     display: block !important;
     text-align: center;
     margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
   }
   
-  .garden-area {
-    margin: 0 auto;
-  }
-  
+  /* Ensure the grid cells have appropriate styling for print */
   .garden-grid {
     border: 2px solid black !important;
+    page-break-inside: avoid;
   }
   
   .grid-cell {
@@ -406,31 +476,24 @@
     height: 80px !important;
   }
   
+  /* Grid information styling */
   .grid-info {
     margin-top: 20px;
+    text-align: center;
+    font-size: 14px;
   }
   
+  /* Add space at the top of the page and ensure landscape */
   @page {
     size: landscape;
-    margin: 1cm;
-  }
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .controls-row {
-    flex-direction: column;
+    margin: 1.5cm;
   }
   
-  .plant-items {
-    justify-content: center;
-  }
-  
-  .plant-item {
-    width: 70px !important;
+  /* Remove background colors that waste ink */
+  body {
+    background-color: white !important;
   }
 }
-
 
 .save-dialog-overlay {
     position: fixed;
