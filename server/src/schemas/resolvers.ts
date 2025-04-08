@@ -28,31 +28,36 @@ const resolvers: IResolvers = {
       }
       throw new AuthenticationError('Could not authenticate user.');
     },
-    userGardens: async (_parent: any, _args: any, context: GraphQLContext) => {
-      if (!context.user) {
-        throw new AuthenticationError('You must be logged in to view gardens');
-      }
-
-      const gardens = await GardenPlan.find({ userId: context.user._id });
-
-      // For each garden, find its plants
-      const gardensWithPlants = await Promise.all(gardens.map(async (garden: { _id: any; name: string; rows: number; cols: number }) => {
-        const plants = await PlantPlacement.find({ gardenId: garden._id }) as Array<{ _id: any; plantId: string; row: number; col: number }>;
-
+    userGardens: async (_, __, { user }) => {
+      if (!user) throw new AuthenticationError("Not logged in");
+      
+      // Get all garden plans for this user
+      const gardenPlans = await GardenPlan.find({ userId: user._id });
+      
+      // For each garden plan, fetch the plant placements
+      const gardensWithPlants = await Promise.all(gardenPlans.map(async (garden) => {
+        // Get all plant placements for this garden
+        const plantPlacements = await PlantPlacement.find({ gardenId: garden._id });
+        
+        // Convert to the format expected by the frontend
+        const plants = plantPlacements.map(placement => ({
+          row: placement.row,
+          col: placement.col,
+          plantId: placement.plantId,
+          plantName: placement.plantName,
+          color: placement.color,
+          image: placement.image
+        }));
+        
         return {
-          id: garden._id.toString(),  
+          id: garden._id,
           name: garden.name,
           rows: garden.rows,
           cols: garden.cols,
-          plants: plants.map(plant => ({
-            id: plant._id.toString(), 
-            plantId: plant.plantId,
-            row: plant.row,
-            col: plant.col
-          }))
+          plants
         };
       }));
-
+      
       return gardensWithPlants;
     },
     garden: async (_parent: any, { id }: { id: string }, context: GraphQLContext) => {

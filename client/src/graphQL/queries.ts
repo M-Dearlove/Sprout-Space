@@ -38,10 +38,12 @@ export const GET_USER_GARDENS = gql`
       rows
       cols
       plants {
-        id
-        plantId
         row
         col
+        plantId
+        plantName
+        color
+        image
       }
     }
   }

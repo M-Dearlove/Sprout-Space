@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/client';
 import { QUERY_ME, GET_USER_GARDENS } from '../graphQL/queries';
 import '../styles/Profile.css';
-import { Link, useLocation } from 'react-router-dom'; // Add useLocation import
+import { Link, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
 const ProfilePage = () => {
-  const location = useLocation(); // Add this to access location
+  const location = useLocation();
   
   const { loading: profileLoading, error: profileError, data: profileData } = useQuery(QUERY_ME);
   const { loading: gardensLoading, error: gardensError, data: gardensData, refetch: refetchGardens } = useQuery(GET_USER_GARDENS, {
@@ -35,16 +35,13 @@ const ProfilePage = () => {
   const hasGardens = gardens.length > 0;
 
   return (
-    // Main container
     <div className="profilePage-container">
       <div className="profile-container">
-        {/* Header Container*/}
         <div className="profile-header">
           <h1>{firstname}'s Garden Plans</h1>
           <p>"The glory of gardening: hands in the dirt, head in the sun, heart with nature." - Alfred Austin </p>
         </div>
         <div className="savedPlot-container">
-          {/* Garden Plots Container */}
           {gardensLoading ? (
             <p>Loading your garden plans...</p>
           ) : gardensError ? (
@@ -70,14 +67,21 @@ const ProfilePage = () => {
   );
 };
 
-// Garden card component to display each saved garden
+// Updated Garden card component to display each saved garden
 interface GardenCardProps {
   garden: {
     id: string;
     name: string;
     rows: number;
     cols: number;
-    plants?: { row: number; col: number; plantId: string }[];
+    plants?: {
+      row: number;
+      col: number;
+      plantId: string;
+      plantName?: string;
+      color?: string;
+      image?: string;
+    }[];
   };
 }
 
@@ -105,24 +109,45 @@ const GardenCard = ({ garden }: GardenCardProps) => {
   );
 };
 
-// Simple garden preview component
+// Updated garden preview component with improved image display
+interface PlantInfo {
+  id: string;
+  plantName?: string;
+  color?: string;
+  image?: string;
+}
+
 interface Garden {
   rows: number;
   cols: number;
-  plants?: { row: number; col: number; plantId: string }[];
+  plants?: {
+    row: number;
+    col: number;
+    plantId: string;
+    plantName?: string;
+    color?: string;
+    image?: string;
+  }[];
 }
 
 const GardenPreview = ({ garden }: { garden: Garden }) => {
   const { rows, cols, plants } = garden;
   
-  // Create a simplified representation of the garden grid
-  const grid = Array(rows).fill(null).map(() => Array(cols).fill(null));
+  // Create a grid with null cells
+  const grid: (PlantInfo | null)[][] = Array(rows)
+    .fill(null)
+    .map(() => Array(cols).fill(null));
   
-  // Place plants in the grid for preview
+  // Place plants in the grid
   if (plants && plants.length > 0) {
-    plants.forEach((plant: { row: number; col: number; plantId: any; }) => {
+    plants.forEach((plant) => {
       if (plant.row < rows && plant.col < cols) {
-        grid[plant.row][plant.col] = { id: plant.plantId };
+        grid[plant.row][plant.col] = { 
+          id: plant.plantId,
+          plantName: plant.plantName,
+          color: plant.color || '#4CAF50', // Default green if no color provided
+          image: plant.image
+        };
       }
     });
   }
@@ -140,16 +165,34 @@ const GardenPreview = ({ garden }: { garden: Garden }) => {
       }}
     >
       {grid.map((row, rowIndex) => 
-        row.map((cell, colIndex) => (
-          <div 
-            key={`${rowIndex}-${colIndex}`}
-            className="preview-cell"
-            style={{
-              backgroundColor: cell ? '#4CAF50' : '#f9f9f9',
-              aspectRatio: '1/1'
-            }}
-          />
-        ))
+        row.map((plant, colIndex) => {
+          // Determine if we have a valid image URL to display
+          const hasValidImage = plant?.image && plant.image.trim() !== '';
+          
+          return (
+            <div 
+              key={`${rowIndex}-${colIndex}`}
+              className={`preview-cell ${hasValidImage ? 'with-image' : ''}`}
+              style={{
+                backgroundColor: hasValidImage ? 'transparent' : (plant ? plant.color : '#f9f9f9'),
+                backgroundImage: hasValidImage ? `url(${plant.image})` : 'none',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                aspectRatio: '1/1',
+                position: 'relative'
+              }}
+              title={plant ? plant.plantName || 'Plant' : 'Empty space'}
+            >
+              {/* Optional: Add plant name overlay on hover */}
+              {plant && plant.plantName && (
+                <div className="plant-name-overlay">
+                  {plant.plantName}
+                </div>
+              )}
+            </div>
+          );
+        })
       )}
     </div>
   );
