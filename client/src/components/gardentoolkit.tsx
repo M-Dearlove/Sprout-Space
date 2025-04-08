@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import '../styles/GardenToolkit.css';
+import '../styles/gardentoolkit.css';
 
 /**
  * Interface defining a vegetable's properties
