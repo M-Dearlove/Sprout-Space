@@ -19,6 +19,11 @@ import {
 import { IResolvers } from '@graphql-tools/utils';
 
 const resolvers: IResolvers = {
+  User: {
+    createdAt: (parent: any) => {
+      return new Date(parent.createdAt).toISOString();
+    },
+  },
   Query: {
     // Get authenticated user information
     me: async (_parent: any, _args: any, context: GraphQLContext) => {
