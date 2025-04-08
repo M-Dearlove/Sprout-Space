@@ -6,6 +6,7 @@ const typeDefs = `
     lastname: String!
     email: String!
     token: String
+    createdAt: String
   }
 
   type AuthPayload {

@@ -1,4 +1,4 @@
-// server/seed/plantSeed.ts
+//seed.ts
 
 import  Plant  from '../models/Plant.js';
 import db from '../config/connection.js';
