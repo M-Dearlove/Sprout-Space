@@ -57,6 +57,19 @@ export const SET_USER_ROLE = gql`
   }
 `;
 
+export const UPDATE_USER = gql`
+  mutation UpdateUser($userId: ID!, $userData: UserUpdateInput!) {
+    updateUser(userId: $userId, userData: $userData) {
+      _id
+      firstname
+      lastname
+      email
+      role
+      createdAt
+    }
+  }
+`;
+
 //Garden Planner mutations
 export const SAVE_GARDEN_MUTATION = gql`
   mutation SaveGarden($name: String!, $rows: Int!, $cols: Int!, $plants: [PlantInput!]!) {
