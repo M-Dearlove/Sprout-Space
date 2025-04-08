@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_USERS, QUERY_ME } from '../graphQL/queries';
-import { SET_USER_ROLE } from '../graphQL/mutations';
+import { SET_USER_ROLE, DELETE_USER } from '../graphQL/mutations';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Admin.css';
 
@@ -34,6 +34,22 @@ const AdminPage: React.FC = () => {
       setTimeout(() => setMessage(null), 5000);
     }
   });
+
+  // Delete user mutation
+  const [deleteUser, { loading: deletingUser }] = useMutation(DELETE_USER, {
+    onCompleted: () => {
+      setMessage({ text: 'User deleted successfully', type: 'success' });
+      // Clear the message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+      refetch(); // Refresh the users list
+    },
+    onError: (error) => {
+      setMessage({ text: `Error deleting user: ${error.message}`, type: 'error' });
+      // Clear the message after 5 seconds
+      setTimeout(() => setMessage(null), 5000);
+    }
+  });
+
 
   // Check if user is admin, if not redirect to home
   useEffect(() => {
@@ -94,6 +110,18 @@ const AdminPage: React.FC = () => {
       });
     }
   };
+
+// Handle deleting user
+const handleDeleteUser = (userId: string, firstName: string, lastName: string) => {
+  if (window.confirm(`Are you sure you want to delete user ${firstName} ${lastName}? This action cannot be undone and will remove all associated data.`)) {
+    deleteUser({
+      variables: {
+        userId
+      }
+    });
+  }
+};
+
 
   if (userLoading) return <div className="admin-container"><p>Loading...</p></div>;
   if (!userData || userData.me.role !== 'admin') return null;
@@ -164,7 +192,7 @@ const AdminPage: React.FC = () => {
                       </span>
                     </td>
                     <td>{user.createdAt ? new Date(parseInt(user.createdAt)).toLocaleDateString() : 'N/A'}</td>
-                    <td>
+                    <td className='action-buttons'>
                       <button 
                         className="role-toggle-btn"
                         onClick={() => handleRoleToggle(user._id, user.role || 'user')}
@@ -172,6 +200,14 @@ const AdminPage: React.FC = () => {
                         title={user._id === userData.me._id ? "Cannot change your own role" : ""}
                       >
                         {user.role === 'admin' ? 'Make User' : 'Make Admin'}
+                      </button>
+                      <button 
+                        className="delete-user-btn"
+                        onClick={() => handleDeleteUser(user._id, user.firstname, user.lastname)}
+                        disabled={deletingUser || user._id === userData.me._id} // Prevent deleting own account
+                        title={user._id === userData.me._id ? "Cannot delete your own account" : ""}
+                      >
+                        Delete User
                       </button>
                     </td>
                   </tr>

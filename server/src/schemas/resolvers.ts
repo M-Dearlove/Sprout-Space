@@ -192,6 +192,38 @@ const resolvers: IResolvers = {
         return { token, user };
       },
 
+      deleteUser: async (_parent: any, { userId }: { userId: string }, context: GraphQLContext) => {
+        // Check if current user is admin
+        if (!context.user) {
+          throw new AuthenticationError('You must be logged in to perform this action');
+        }
+        
+        const currentUser = await User.findById(context.user._id);
+        if (!currentUser || currentUser.role !== 'admin') {
+          throw new AuthenticationError('You must be an admin to delete users');
+        }
+        
+        // Prevent admins from deleting themselves
+        if (userId === context.user._id.toString()) {
+          throw new Error('You cannot delete your own account');
+        }
+        
+        // Delete the user
+        const deletedUser = await User.findByIdAndDelete(userId);
+        
+        if (!deletedUser) {
+          throw new Error('User not found');
+        }
+        
+        // Optional: Delete associated data (gardens, plant placements, etc.)
+        // This depends on your application's requirements
+        await GardenPlan.deleteMany({ userId });
+        const gardenIds = await GardenPlan.find({ userId }).distinct('_id');
+        await PlantPlacement.deleteMany({ gardenId: { $in: gardenIds } });
+        
+        return deletedUser;
+      },
+
       //rest password
       resetPassword: async (_parent: any, { email, newPassword }: ResetPasswordArgs) => {
         const user = await User.findOne({ email });
