@@ -148,6 +148,7 @@ const GardenCard = ({ garden, onDelete, isDeleting }: GardenCardProps) => {
   );
 };
 
+
 // Garden preview component remains unchanged
 interface PlantInfo {
   id: string;
