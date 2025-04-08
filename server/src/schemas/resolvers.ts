@@ -8,13 +8,12 @@ import {
   RegisterUserArgs,
   LoginUserArgs,
   ResetPasswordArgs,
-  GraphQLContext
+  GraphQLContext,
+  SetUserRoleArgs
 } from '../interfaces/user-interfaces.js'
 import {
   SaveGardenArgs,
 } from '../interfaces/garden-interfaces.js'
-
-
 
 import { IResolvers } from '@graphql-tools/utils';
 
@@ -27,11 +26,24 @@ const resolvers: IResolvers = {
   Query: {
     // Get authenticated user information
     me: async (_parent: any, _args: any, context: GraphQLContext) => {
-      console.log("Resolver Context Object:", context);
       if (context && context.user) {
         return await User.findById(context.user._id);
       }
       throw new AuthenticationError('Could not authenticate user.');
+    },
+    // Get all users (admin only)
+    users: async (_parent: any, _args: any, context: GraphQLContext) => {
+      if (!context.user) {
+        throw new AuthenticationError('You must be logged in to view users');
+      }
+      
+      const user = await User.findById(context.user._id);
+      
+      if (!user || user.role !== 'admin') {
+        throw new AuthenticationError('You must be an admin to view all users');
+      }
+      
+      return await User.find({});
     },
     userGardens: async (_, __, { user }) => {
       if (!user) throw new AuthenticationError("Not logged in");
@@ -180,6 +192,7 @@ const resolvers: IResolvers = {
         return { token, user };
       },
 
+      //rest password
       resetPassword: async (_parent: any, { email, newPassword }: ResetPasswordArgs) => {
         const user = await User.findOne({ email });
 
@@ -193,6 +206,32 @@ const resolvers: IResolvers = {
         return true;
       },
 
+      //set user role - admin or user
+      setUserRole: async (_parent: any, { userId, role }: SetUserRoleArgs, context: GraphQLContext) => {
+        // Check if current user is admin
+        if (!context.user) {
+          throw new AuthenticationError('You must be logged in to perform this action');
+        }
+        
+        const currentUser = await User.findById(context.user._id);
+        if (!currentUser || currentUser.role !== 'admin') {
+          throw new AuthenticationError('You must be an admin to set user roles');
+        }
+        
+        // Update the user's role
+        const updatedUser = await User.findByIdAndUpdate(
+          userId,
+          { role },
+          { new: true }
+        );
+        
+        if (!updatedUser) {
+          throw new Error('User not found');
+        }
+        
+        return updatedUser;
+      },
+      
       //garden planner resolvers
       saveGarden: async (_parent: any, { name, rows, cols, plants }: SaveGardenArgs, context: GraphQLContext) => {
         // Check if user is authenticated

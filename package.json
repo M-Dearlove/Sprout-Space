@@ -17,6 +17,7 @@
     "client:dev": "cd client && npm run dev",
     "build": "npm run server:build && npm run client:build",
     "seed": "cd server && npm run seed",
+    "seed-user": "cd server && npm run seed-user",
     "render-build": "npm install && npm run server:build && npm run client:build"
   },
   "repository": {

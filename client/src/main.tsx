@@ -6,6 +6,7 @@ import MainPage from './pages/MainPage.tsx'
 import ErrorPage from './pages/ErrorPage.tsx';
 import GardenPlanner from './pages/GardenPlanner.tsx'
 import ProfilePage from './pages/Profile.tsx'
+import AdminPage from './pages/AdminPage.tsx'
 
 console.log('Running MAIN.tsx')
 const router = createBrowserRouter([
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       path: '/profile',
       element: <ProfilePage />
     },
+    {
+      path: '/admin',
+      element: <AdminPage />
+    }
   ]
   }
 ]);

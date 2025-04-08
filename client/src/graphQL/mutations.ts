@@ -33,6 +33,18 @@ export const RESET_PASSWORD = gql`
   }
 `;
 
+export const SET_USER_ROLE = gql`
+  mutation SetUserRole($userId: ID!, $role: String!) {
+    setUserRole(userId: $userId, role: $role) {
+      _id
+      firstname
+      lastname
+      email
+      role
+    }
+  }
+`;
+
 //Garden Planner mutations
 export const SAVE_GARDEN_MUTATION = gql`
   mutation SaveGarden($name: String!, $rows: Int!, $cols: Int!, $plants: [PlantInput!]!) {

@@ -5,8 +5,9 @@ const typeDefs = `
     firstname: String!
     lastname: String!
     email: String!
-    token: String
+    role: String!
     createdAt: String
+    token: String
   }
 
   type AuthPayload {
@@ -16,6 +17,7 @@ const typeDefs = `
 
   type Query {
     me: User
+    users: [User] 
     userGardens: [Garden]
     garden(id: ID!): Garden
     getPlantCareInfo(plantName: String!): String
@@ -90,6 +92,7 @@ const typeDefs = `
     resetPassword(email: String!, newPassword: String!): Boolean
     saveGarden(name: String!, rows: Int!, cols: Int!, plants: [PlantInput!]): Garden
     deleteGarden(id: ID!): Garden
+    setUserRole(userId: ID!, role: String!): User
   }
 `;
 

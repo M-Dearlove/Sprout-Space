@@ -7,6 +7,8 @@ interface IUser extends Document {
   firstname: string;
   lastname: string;
   password: string;
+  role: string;
+  createdAt: string;
   isCorrectPassword(password: string): Promise<boolean>;
 }
 
@@ -34,6 +36,12 @@ const userSchema = new Schema<IUser>(
       required: true,
       minlength: 5,
     },
+    role: {
+      type: String,
+      default: 'user',
+      enum: ['user', 'admin'],
+    },
+   
   },
   {
     timestamps: true,
