@@ -2,6 +2,7 @@ import Plant from '../models/Plant.js';
 import db from '../config/connection.js';
 import cleanDB from './cleanDB.js';
 
+
 // Plant data from the client-side plantData.ts file, adapted for the database
 const plantSeeds = [
   {
@@ -19,7 +20,7 @@ const plantSeeds = [
     plantPests: 'Aphids, hornworms, whiteflies',
     plantDiseases: 'Blight, wilt, powdery mildew',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#e77c7c',
   },
   {
@@ -91,7 +92,7 @@ const plantSeeds = [
     plantPests: 'Squash bugs, squash vine borers',
     plantDiseases: 'Powdery mildew, blossom end rot',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#7fb3da',
   },
   {
@@ -181,7 +182,7 @@ const plantSeeds = [
     plantPests: 'Cabbage worms, aphids, flea beetles',
     plantDiseases: 'Black rot, downy mildew',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#89bb9e',
   },
   {
@@ -199,7 +200,7 @@ const plantSeeds = [
     plantPests: 'Cabbage worms, aphids, flea beetles',
     plantDiseases: 'Black rot, downy mildew',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#e0e0e0',
   },
   {
@@ -506,7 +507,7 @@ const plantSeeds = [
     plantPests: 'Flea beetles, spider mites',
     plantDiseases: 'Verticillium wilt, blossom end rot',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#614051',
   },
   {
@@ -578,7 +579,7 @@ const plantSeeds = [
     plantPests: 'Blueberry maggots, aphids',
     plantDiseases: 'Mummy berry, powdery mildew',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#457b9d',
   },
   {
@@ -596,7 +597,7 @@ const plantSeeds = [
     plantPests: 'Japanese beetles, aphids',
     plantDiseases: 'Gray mold, cane blight',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#d00000',
   },
   {
@@ -722,7 +723,7 @@ const plantSeeds = [
     plantPests: 'Aphids, cabbage worms',
     plantDiseases: 'Black rot, clubroot',
     spacing: 18,
-    plantsPerSquareFoot: 0.5,
+    plantsPerSquareFoot: 0.25,
     color: '#a7c957',
   },
   {
@@ -745,24 +746,31 @@ const plantSeeds = [
   }
 ];
 
-const seedDB = async ():Promise<void> => {
+const seedDB = async () => {
   if (process.env.SEED_DATABASE === 'true') {
     try {
       // Connect to the database
       await db();
       console.log('Connected to the database');
+      
+      // Clear existing collections
       await cleanDB();
-      // Insert new plant documents
-       await Plant.insertMany(plantSeeds);
-       console.log(`${plantSeeds.length} plants inserted into database`);
+      console.log('Database cleared');
+      
+      // Seed plants
+      await Plant.insertMany(plantSeeds);
+      console.log(`${plantSeeds.length} plants inserted into database`);
+      
+      console.log('Database seeding completed successfully!');
+      process.exit(0);
     
-       console.log('Database seeded successfully!');
-       process.exit(0);
-    
-   } catch (err) {
-       console.error('Error seeding database:', err);
-       process.exit(1);
-   }
+    } catch (err) {
+      console.error('Error seeding database:', err);
+      process.exit(1);
+    }
+  } else {
+    console.log('Seeding skipped. Set SEED_DATABASE=true to seed the database.');
+    process.exit(0);
   }
 };
 seedDB();

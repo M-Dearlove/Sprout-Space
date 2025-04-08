@@ -16,6 +16,12 @@ export interface ResetPasswordArgs {
   newPassword: string;
 }
 
+export interface SetUserRoleArgs {
+  userId: string;
+  role: string;
+}
+
+
 // Define GraphQL Context interface
 export interface GraphQLContext {
   user?: {

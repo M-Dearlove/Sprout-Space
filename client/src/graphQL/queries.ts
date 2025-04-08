@@ -1,5 +1,17 @@
 import { gql } from "@apollo/client";
 
+export const GET_ALL_USERS = gql`
+  query GetAllUsers {
+    users {
+      _id
+      firstname
+      lastname
+      email
+      role
+      createdAt
+    }
+  }
+`;
 
 // QUERY LOGGED-IN USER
 export const QUERY_ME = gql`
@@ -9,6 +21,7 @@ export const QUERY_ME = gql`
       firstname
       lastname
       email
+      role
     }
   }
 `;
