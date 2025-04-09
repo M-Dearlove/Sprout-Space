@@ -1,4 +1,3 @@
-
 const typeDefs = `
   type User {
     _id: ID!
@@ -22,12 +21,20 @@ const typeDefs = `
     role: String
   }
 
+  type PestInfo {
+    name: String!
+    description: String!
+    treatment: String!
+    image: String
+  }
+
   type Query {
     me: User
     users: [User] 
     userGardens: [Garden]
     garden(id: ID!): Garden
     getPlantCareInfo(plantName: String!): String
+    getPlantPests(plantName: String!): [PestInfo]
     plants: [Plant]
     plant(_id: ID!): Plant
     plantByName(plantName: String!): Plant
