@@ -3,7 +3,7 @@ import GardenPlan from '../models/GardenPlan.js';
 import Plant from '../models/Plant.js';
 import PlantPlacement from '../models/PlantPlacement.js';
 import { signToken, AuthenticationError } from '../utils/auth.js';
-import { getPlantCareParagraph } from '../utils/openai.js';
+import { getPlantCareParagraph, getPlantPestInformation } from '../utils/openai.js';
 import {
   RegisterUserArgs,
   LoginUserArgs,
@@ -118,7 +118,11 @@ const resolvers: IResolvers = {
     getPlantCareInfo: async (_parent: any, args: { plantName: string }) => {
       return await getPlantCareParagraph(args.plantName);
     },
-  
+    // New resolver for plant pest information using OpenAI
+    getPlantPests: async (_parent: any, args: { plantName: string }) => {
+      return await getPlantPestInformation(args.plantName);
+    },
+
    // Plant queries
    plants: async () => {
      try {
