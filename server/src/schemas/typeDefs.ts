@@ -5,7 +5,8 @@ const typeDefs = `
     lastname: String!
     email: String!
     role: String!
-    createdAt: String
+    createdAt: String!
+    updatedAt: String!
     token: String
   }
 
@@ -108,7 +109,7 @@ const typeDefs = `
     deleteGarden(id: ID!): Garden
     setUserRole(userId: ID!, role: String!): User
     deleteUser(userId: ID!): User
-     updateUser(userId: ID!, userData: UserUpdateInput!): User
+    updateUser(userId: ID!, userData: UserUpdateInput!): User
   }
 `;
 

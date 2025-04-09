@@ -8,7 +8,8 @@ interface IUser extends Document {
   lastname: string;
   password: string;
   role: string;
-  createdAt: string;
+  createdAt: Date;
+  updatedAt: Date; // Added updatedAt
   isCorrectPassword(password: string): Promise<boolean>;
 }
 
