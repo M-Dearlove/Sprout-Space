@@ -19,6 +19,7 @@ const LoginModal: React.FC<LoginModalProps> = ({
   const [password, setPassword] = useState("");
   const [firstname, setFirstname] = useState(""); 
   const [lastname, setLastname] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
 
 // Clear input fields when toggling login/register mode
 useEffect(() => {
@@ -26,6 +27,7 @@ useEffect(() => {
       setPassword("");
       setFirstname("");
       setLastname("");
+      setErrorMessage("");
 }, [isLoginMode]);
 
   // GraphQL mutations for login and register
@@ -34,6 +36,8 @@ useEffect(() => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setErrorMessage(""); 
+
     try {
       let response;
       if (isLoginMode) {
@@ -61,14 +65,35 @@ useEffect(() => {
       }
     } catch (err) {
       console.error("Error:", err);
-      alert("An error occurred. Please try again.");
+      //get error message from GtapfQL error
+      const errorMsg = err instanceof Error ? err.message : 
+      typeof err === 'object' && err !== null && 'message' in err ? 
+      (err as {message: string}).message : "An unknown error occurred";
+
+      if (isLoginMode) {
+        if (errorMsg.includes("Invalid credentials")) {
+          setErrorMessage("Invalid email or password. Please try again.");
+        } else {
+          setErrorMessage("Login failed. Please check your credentials and try again.");
+        }
+      } else {
+        if (errorMsg.includes("User already exists")) {
+          setErrorMessage("This email is already registered. Please use a different email or try logging in.");
+        } else {
+          setErrorMessage("Registration failed. Please check your information and try again.");
+        }
+      }
     }
   };
 
   return (
 
     <form onSubmit={handleSubmit} className="login-form">
-      
+      {errorMessage && (
+        <div className="error-message">
+          {errorMessage}
+        </div>
+      )}
       <div className="emailEntry">
         <label>Email:</label>
         <input
@@ -89,7 +114,6 @@ useEffect(() => {
           required
         />
       </div>
-      {/* Add First and Last Name inputs for Registration */}
       {!isLoginMode && (
         <>
           <div className="nameEntry">
