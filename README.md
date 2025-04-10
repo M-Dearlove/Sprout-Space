@@ -36,7 +36,7 @@ We are a dedicated group of developers committed to delivering seamless user exp
 
 
 ## 🎨 **Mock-Up**
-![Application Logo](image.png)
+![Application Logo](image-1.png)
 
 
 ## 💽 **Installation**
