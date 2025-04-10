@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+
+
 export async function fetchPestData(plantName: string) {
   try {
     const response = await axios.get(`https://api.pests.example.com/search?plant=${plantName}`);
