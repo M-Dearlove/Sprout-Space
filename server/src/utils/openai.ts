@@ -120,13 +120,11 @@ function getDefaultPestData(plantName: string): PestInfo[] {
         name: 'Tomato Hornworm',
         description: 'Large green caterpillars that can quickly defoliate tomato plants.',
         treatment: 'Handpick from plants, use Bacillus thuringiensis (Bt), or introduce natural predators like parasitic wasps.',
-        image: 'https://source.unsplash.com/300x200/?tomato,hornworm'
       },
       {
         name: 'Aphids',
         description: 'Small, pear-shaped insects that cluster on new growth and undersides of leaves.',
         treatment: 'Spray with strong water jet, use insecticidal soap, or introduce ladybugs.',
-        image: 'https://source.unsplash.com/300x200/?aphids,plant'
       }
     ],
     'Celery': [
@@ -134,13 +132,11 @@ function getDefaultPestData(plantName: string): PestInfo[] {
         name: 'Aphids',
         description: 'Small sap-sucking insects that can stunt growth and transmit diseases.',
         treatment: 'Use insecticidal soap, neem oil, or strong water spray to remove them.',
-        image: 'https://source.unsplash.com/300x200/?aphids,garden'
       },
       {
         name: 'Celery Leaf Miner',
         description: 'Fly larvae that tunnel between leaf surfaces creating distinctive trails.',
         treatment: 'Remove and destroy affected leaves, use row covers during fly season, or apply organic spinosad spray.',
-        image: 'https://source.unsplash.com/300x200/?celery,pest'
       }
     ],
     // More default data could be added here
@@ -152,13 +148,12 @@ function getDefaultPestData(plantName: string): PestInfo[] {
       name: 'Aphids',
       description: 'Small sap-sucking insects that can affect almost any plant.',
       treatment: 'Spray with water, use insecticidal soap, or introduce beneficial insects.',
-      image: 'https://source.unsplash.com/300x200/?aphids,plant'
     },
     {
       name: 'Spider Mites',
       description: 'Tiny spider-like pests that cause stippling on leaves and fine webbing.',
       treatment: 'Increase humidity, spray with water, or use insecticidal soap or neem oil.',
-      image: 'https://source.unsplash.com/300x200/?spider,mites'
+
     }
   ];
   

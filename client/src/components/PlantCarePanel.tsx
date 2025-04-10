@@ -77,22 +77,11 @@ export default function PlantCarePanel({ plantName }: Props) {
             <div className="pest-list">
               {pests.map((pest, index) => (
                 <div key={index} className="pest-item">
-                  <div className="pest-header">
                     <h4 className="pest-name">{pest.name}</h4>
-                    {pest.image && (
-                      <div className="pest-image-container">
-                        <img 
-                          src={pest.image} 
-                          alt={`${pest.name} on ${plantName}`}
-                          className="pest-image"
-                        />
-                      </div>
-                    )}
-                  </div>
-                  <p className="pest-description">{pest.description}</p>
-                  <div className="pest-treatment">
-                    <h5>Treatment</h5>
-                    <p>{pest.treatment}</p>
+                    <p className="pest-description">{pest.description}</p>
+                    <div className="pest-treatment">
+                     <h5>Treatment</h5>
+                     <p>{pest.treatment}</p>
                   </div>
                 </div>
               ))}
