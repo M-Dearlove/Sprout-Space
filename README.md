@@ -36,7 +36,7 @@ We are a dedicated group of developers committed to delivering seamless user exp
 
 
 ## 🎨 **Mock-Up**
-<img src="mockups/image-1.png" alt="Sprout Space mockup 1" width="250"/> <img src="mockups/image-2.PNG" alt="Sprout Space mockup 2" width="250"/> <img src="mockups/image-3.PNG" alt="Sprout Space mockup 3" width="250"/> <img src="mockups/image-4.PNG" alt="Sprout Space mockup 4" width="250"/> <img src="mockups/image-5.PNG" alt="Sprout Space mockup 5" width="250"/>
+<img src="mockups/image-1.png" alt="Sprout Space mockup 1" width="250"/> <img src="mockups\image-2.PNG" alt="Sprout Space mockup 2" width="250"/> <img src="mockups/image-3.PNG" alt="Sprout Space mockup 3" width="250"/> <img src="mockups/image-4.PNG" alt="Sprout Space mockup 4" width="250"/> <img src="mockups/image-5.PNG" alt="Sprout Space mockup 5" width="250"/>
 
 
 ## 💽 **Installation**
