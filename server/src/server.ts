@@ -27,7 +27,6 @@ app.use(express.json());
 app.use('/graphql', expressMiddleware(server, {
   context: async ({ req }) => {
     const authContext = authenticateToken({ req });
-    console.log("Auth Context:", authContext); // Debugging step
     return authContext;
   }
 }));

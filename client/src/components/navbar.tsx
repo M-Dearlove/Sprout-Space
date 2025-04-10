@@ -1,13 +1,17 @@
 import { Disclosure, DisclosurePanel, DisclosureButton } from '@headlessui/react';
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
+import { QUERY_ME } from '../graphQL/queries';
 import AuthService from "../utils/authService";
 import '../styles/navbar.css';
 
+// Add Admin to navigation options
 const allNavigation = [
     { name: 'Home', href: '/', current: true },
     { name: 'Garden Planner', href: '/garden-planner', current: false },
     { name: 'Profile', href: '/profile', current: false },
+    { name: 'Admin', href: '/admin', current: false, adminOnly: true }, // Add adminOnly flag
     { name: 'Logout', href: '/logout', current: false },
 ];
 
@@ -26,15 +30,27 @@ export default function NavBar() {
         }))
     );
 
+    // Query to check if user is admin
+    const { data: userData } = useQuery(QUERY_ME, {
+        skip: !isLoggedIn, // Skip query if not logged in
+    });
+    
+    const isAdmin = userData?.me?.role === 'admin';
+
     useEffect(() => {
         // Check for token in localStorage
-        const token = localStorage.getItem('id_token');
+        const token = localStorage.getItem('token');
 
         // Update navigation items based on authentication
         if (token) {
-            // Show all navigation items
+            // Filter out admin link if user is not admin
+            const visibleNavItems = allNavigation.filter(item => 
+                !item.adminOnly || (item.adminOnly && isAdmin)
+            );
+            
+            // Show filtered navigation items
             setNavigation(
-                allNavigation.map(item => ({
+                visibleNavItems.map(item => ({
                     ...item,
                     current: item.href === location.pathname // Set current based on path
                 }))
@@ -48,7 +64,7 @@ export default function NavBar() {
                 }
             ]);
         }
-    }, [location.pathname]);
+    }, [location.pathname, isAdmin]); // Add isAdmin to dependency array
 
     const handleLogout = () => {
         AuthService.logout();

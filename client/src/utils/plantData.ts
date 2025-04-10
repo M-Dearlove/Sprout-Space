@@ -1,3 +1,4 @@
+//..client/src/util/plantData.ts
 import pumpkin from '../assets/images/pumpkin.png';
 import carrot from '../assets/images/carrot.png';
 import cucumber from '../assets/images/cucumber.png';
@@ -82,7 +83,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: tomato,
     },
     {
@@ -130,7 +131,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: zucchini,
     },
     {
@@ -178,7 +179,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: broccoli,
     },
     {
@@ -190,7 +191,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: cauliflower,
     },
     {
@@ -334,7 +335,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: eggplant,
     },
     {
@@ -382,7 +383,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: blueberry,
     },
     {
@@ -394,7 +395,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: raspberry,
     },
     {
@@ -478,7 +479,7 @@ export interface Plant {
       spacing: 18,
       sunlight: 'Full sun',
       water: 'Regular',
-      plantsPerSquareFoot: 0.5,
+      plantsPerSquareFoot: 0.25,
       image: brussels,
     },
     {

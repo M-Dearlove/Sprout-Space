@@ -1,0 +1,139 @@
+/* Add to PlantCarePanel.css */
+
+.plant-care-panel {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.panel-title {
+  color: #2e7d32;
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+}
+
+.care-info-text {
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  font-style: italic;
+  color: #757575;
+}
+
+/* Pest Information Section Styles */
+.pest-section {
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.pest-title {
+  color: #d32f2f;
+  font-size: 1.3rem;
+  margin-bottom: 15px;
+}
+
+.pest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.pest-item {
+  background-color: white;
+  border-radius: 6px;
+  padding: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #d32f2f;
+}
+
+.pest-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.pest-name {
+  color: #d32f2f;
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+  flex: 1;
+}
+
+.pest-image-container {
+  width: 100px;
+  height: 80px;
+  margin-left: 15px;
+  overflow: hidden;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+}
+
+.pest-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pest-description {
+  margin-bottom: 15px;
+  line-height: 1.5;
+}
+
+.pest-treatment {
+  background-color: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.pest-treatment h5 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #2e7d32;
+  font-size: 1rem;
+}
+
+.pest-treatment p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .pest-header {
+    flex-direction: column;
+  }
+  
+  .pest-image-container {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+    height: 120px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .plant-care-panel {
+    break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+  
+  .pest-item {
+    break-inside: avoid;
+  }
+  
+  .pest-image-container {
+    break-inside: avoid;
+  }
+}

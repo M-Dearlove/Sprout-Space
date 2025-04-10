@@ -41,7 +41,15 @@ function MainPage() {
         <div className="right-side">
           <img src={logo} alt="logo" className="logo" />
           <div className="login-container">
-                 <h2>
+            {/*Hide form when logged in */}
+            {isLoggedIn ? (
+            <div>
+              <h2>You are logged in.</h2>
+              <p>Enjoy digging into your next garden design!</p>
+            </div>
+            ):(
+              <>
+                <h2>
                   {isResetPasswordMode ? "Reset Password" : isLoginMode ? "Welcome Back!" : "Create an Account"}
                 </h2>
                 {isResetPasswordMode ? (
@@ -65,7 +73,9 @@ function MainPage() {
                     {isLoginMode ? "Register Here" : "Login Here"}
                   </span>
                 </p>
-           </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </main>

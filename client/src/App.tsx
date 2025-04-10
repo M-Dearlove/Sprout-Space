@@ -6,7 +6,7 @@ import Footer from "./components/Footer";
 
 //Set up HTTP connection to GraphQL server
 const httpLink = createHttpLink({
-  uri: 'http://localhost:3001/graphql',
+  uri: '/graphql',
 });
 
 // Middleware to add the token in the headers
