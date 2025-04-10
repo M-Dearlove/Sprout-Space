@@ -1,10 +1,12 @@
 import  { createRoot }  from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import './index.css'
+import './styles/index.css'
 import App from './App'
 import MainPage from './pages/MainPage.tsx'
 import ErrorPage from './pages/ErrorPage.tsx';
-
+import GardenPlanner from './pages/GardenPlanner.tsx'
+import ProfilePage from './pages/Profile.tsx'
+import AdminPage from './pages/AdminPage.tsx'
 
 console.log('Running MAIN.tsx')
 const router = createBrowserRouter([
@@ -17,10 +19,18 @@ const router = createBrowserRouter([
       index: true,      // when root is visited, MainPage will load as outlet
       element: <MainPage />
     }, 
-    // {
-    //   path: '/dash',
-    //   element: <DashPage />
-    // },
+    {
+      path: '/garden-planner',
+      element: <GardenPlanner />
+    },
+    {
+      path: '/profile',
+      element: <ProfilePage />
+    },
+    {
+      path: '/admin',
+      element: <AdminPage />
+    }
   ]
   }
 ]);
