@@ -1,4 +1,3 @@
-
 const typeDefs = `
   type User {
     _id: ID!
@@ -6,7 +5,8 @@ const typeDefs = `
     lastname: String!
     email: String!
     role: String!
-    createdAt: String
+    createdAt: String!
+    updatedAt: String!
     token: String
   }
 
@@ -22,12 +22,20 @@ const typeDefs = `
     role: String
   }
 
+  type PestInfo {
+    name: String!
+    description: String!
+    treatment: String!
+    image: String
+  }
+
   type Query {
     me: User
     users: [User] 
     userGardens: [Garden]
     garden(id: ID!): Garden
     getPlantCareInfo(plantName: String!): String
+    getPlantPests(plantName: String!): [PestInfo]
     plants: [Plant]
     plant(_id: ID!): Plant
     plantByName(plantName: String!): Plant
@@ -101,7 +109,7 @@ const typeDefs = `
     deleteGarden(id: ID!): Garden
     setUserRole(userId: ID!, role: String!): User
     deleteUser(userId: ID!): User
-     updateUser(userId: ID!, userData: UserUpdateInput!): User
+    updateUser(userId: ID!, userData: UserUpdateInput!): User
   }
 `;
 

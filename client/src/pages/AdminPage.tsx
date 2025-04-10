@@ -192,7 +192,11 @@ const handleDeleteUser = (userId: string, firstName: string, lastName: string) =
                         {user.role || 'user'}
                       </span>
                     </td>
-                    <td>{user.createdAt ? new Date(parseInt(user.createdAt)).toLocaleDateString() : 'N/A'}</td>
+                    <td>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }) : 'N/A'}</td>
                     <td className='action-buttons'>
                     <EditUserButton 
                         user={user} 
