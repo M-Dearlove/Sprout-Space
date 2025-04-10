@@ -1,5 +1,7 @@
 import { Schema, type Document } from 'mongoose';
 
+
+
 export interface GardenDocument extends Document {
     gardenName: string;
     gardenType: string;
