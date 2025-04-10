@@ -35,14 +35,23 @@ We are a dedicated group of developers committed to delivering seamless user exp
 
 
 
-## 🎨 **Mock-Up**
-![Application Logo](image-1.png)
+## 🎨 **Mock-Up Images**
+<p align="center">
+  <img src="mockups/image-1.png" alt="Sprout Space mockup 1" width="240" height="160"/>
+  <img src="mockups/image-2.PNG" alt="Sprout Space mockup 2" width="240" height="160"/>
+  <img src="mockups/image-3.PNG" alt="Sprout Space mockup 3" width="240" height="160"/>
+</p>
+<p align="center">
+  <img src="mockups/image-4.PNG" alt="Sprout Space mockup 4" width="240" height="160"/>
+  <img src="mockups/image-5.PNG" alt="Sprout Space mockup 5" width="240" height="160"/>
+  <img src="mockups/image-6.png" alt="Sprout Space mockup 6" width="240" height="160"/>
+</p>
 
 
 ## 💽 **Installation**
 
 First, Download the required dependencies for the front and backend directories in the package.json files. React, react-router dom, dotenv, apollo/client, graphql, bcrypt, cors, express, and mongoose. Once the dependencies are installed on the package.json, then you will need to run the terminal commands if running locally. <br/>
-As follows the terminal commands are npm install, npm run build, and lastly npm run dev. This is for local execution. A deploy link is provided above if you want to use/test the application out without installation. 
+As follows the terminal commands are npm install, npm run build, and lastly npm run start:dev. This is for local execution. A deploy link is provided above if you want to use/test the application out without installation. 
 
 ## 🖱️ **Usage**
 
