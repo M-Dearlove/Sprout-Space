@@ -36,7 +36,7 @@ We are a dedicated group of developers committed to delivering seamless user exp
 
 
 ## 🎨 **Mock-Up**
-![Application Logo](image-1.png)
+<img src="mockups/image-1.png" alt="Sprout Space mockup 1" width="250"/> <img src="mockups/image-2.png" alt="Sprout Space mockup 2" width="250"/> <img src="mockups/image-3.png" alt="Sprout Space mockup 3" width="250"/> <img src="mockups/image-4.png" alt="Sprout Space mockup 4" width="250"/> <img src="mockups/image-5.png" alt="Sprout Space mockup 5" width="250"/>
 
 
 ## 💽 **Installation**
