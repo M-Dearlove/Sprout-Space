@@ -44,7 +44,7 @@ We are a dedicated group of developers committed to delivering seamless user exp
 <p align="center">
   <img src="mockups/image-4.PNG" alt="Sprout Space mockup 4" width="240" height="160"/>
   <img src="mockups/image-5.PNG" alt="Sprout Space mockup 5" width="240" height="160"/>
-  <img src="mockups/image-6.PNG" alt="Sprout Space mockup 6" width="240" height="160"/>
+  <img src="mockups/image-6.png" alt="Sprout Space mockup 6" width="240" height="160"/>
 </p>
 
 
